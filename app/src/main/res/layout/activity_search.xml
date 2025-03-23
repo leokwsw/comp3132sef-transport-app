@@ -33,45 +33,28 @@
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"/>
+
     </LinearLayout>
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/search_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
-
-        <EditText
-            android:id="@+id/search_input"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Enter route number or name..."
-            android:background="@drawable/search_background"
-            android:padding="10dp"
-            android:drawableStart="@android:drawable/ic_menu_search"
-            android:drawablePadding="8dp"
-            android:textColor="#000000"
-            android:textColorHint="#757575"/>
-
-        <ToggleButton
-            android:id="@+id/night_bus_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textOn="Night Bus: On"
-            android:textOff="Night Bus: Off"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#0D47A1"/>
-    </LinearLayout>
+        android:layout_margin="16dp"
+        android:hint="Enter route number or name..."
+        android:background="@drawable/search_background"
+        android:padding="10dp"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:drawablePadding="8dp"
+        android:textColor="#000000"
+        android:textColorHint="#757575"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/search_results"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#FFFFFF"
+        android:background="@android:color/white"
         android:padding="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
