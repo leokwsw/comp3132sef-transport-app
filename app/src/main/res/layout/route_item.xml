@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="12dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="#FFFFFF">
 
-    <!-- 路線名稱和到達時間（一行） -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <!-- 路線名稱（左邊） -->
         <TextView
             android:id="@+id/route_name"
             android:layout_width="0dp"
@@ -23,7 +21,6 @@
             android:textSize="18sp"
             android:textStyle="bold"/>
 
-        <!-- 到達時間（右邊） -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,7 +52,6 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 終點站 -->
     <TextView
         android:id="@+id/destination"
         android:layout_width="wrap_content"
@@ -64,7 +60,6 @@
         android:textSize="14sp"
         android:layout_marginTop="4dp"/>
 
-    <!-- 當前站點 -->
     <TextView
         android:id="@+id/current_stop"
         android:layout_width="wrap_content"
