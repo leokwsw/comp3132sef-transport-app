@@ -5,11 +5,8 @@ import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.example.transportapp.model.KmbRouteResponse;
+import com.example.transportapp.model.kmb.RouteListResponse;
 import com.example.transportapp.network.KmbApiService;
 import com.example.transportapp.network.RetrofitClient;
 
@@ -26,18 +23,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         KmbApiService apiService = RetrofitClient.getService();
-        apiService.getRoutes().enqueue(new Callback<KmbRouteResponse>() {
+        apiService.getRoutes().enqueue(new Callback<RouteListResponse>() {
             @Override
-            public void onResponse(Call<KmbRouteResponse> call, Response<KmbRouteResponse> response) {
+            public void onResponse(Call<RouteListResponse> call, Response<RouteListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    for (KmbRouteResponse.Route route : response.body().data) {
+                    for (RouteListResponse.Route route : response.body().data) {
                         Log.d("API", "Route: " + route.route + ", From: " + route.orig_en + " To: " + route.dest_en);
                     }
                 }
             }
 
             @Override
-            public void onFailure(Call<KmbRouteResponse> call, Throwable t) {
+            public void onFailure(Call<RouteListResponse> call, Throwable t) {
                 Log.e("API_ERROR", "Failed to load data", t);
             }
         });
