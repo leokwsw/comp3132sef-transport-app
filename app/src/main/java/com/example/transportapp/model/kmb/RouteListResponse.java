@@ -1,8 +1,8 @@
-package com.example.transportapp.model;
+package com.example.transportapp.model.kmb;
 
 import java.util.List;
 
-public class KmbRouteResponse {
+public class RouteListResponse {
     public List<Route> data;
 
     public static class Route {
