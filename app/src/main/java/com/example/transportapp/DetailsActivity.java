@@ -3,6 +3,7 @@ package com.example.transportapp;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
@@ -10,6 +11,7 @@ import android.widget.ImageButton;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.app.ActivityCompat;
 
 import com.example.transportapp.model.kmb.RouteResponse;
@@ -27,10 +29,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
@@ -42,6 +53,7 @@ import retrofit2.Response;
 
 public class DetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    private final String TAG = "Amomo";
     public static String ROUTE_KEY = "route";
     public static String DIRECTION_KEY = "direction";
     public static String DIRECTION_OUTBOUND = "outbound";
@@ -63,11 +75,20 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
     private static final int LOCATION_REQUEST_CODE = 100;
     private Marker userMarker;
 
+    private AppCompatTextView title;
+
+    private KmbApiService apiService;
+    private List<StopResponse.StopData> stopDataList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_bus_detail);
+        // init network service
+        apiService = RetrofitClient.getService();
+        // init ui components
+        title = findViewById(R.id.route_name);
 
 //        if (getIntent().getExtras() != null) {
 //            route = getIntent().getExtras().getString(ROUTE_KEY);
@@ -85,47 +106,69 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
 //            onBackPressed();
 //        }
 
-        KmbApiService apiService = RetrofitClient.getService();
+        setTitle();
+
+
+        findViewById(R.id.back_button).setOnClickListener(v -> onBackPressed());
+
+        btnToggleLocation = findViewById(R.id.btnToggleLocation);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        btnToggleLocation.setOnClickListener(v -> toggleUserLocation());
+    }
+
+    private void setTitle() {
         apiService.getRoute(route, direction, serviceType).enqueue(new Callback<RouteResponse>() {
             @Override
-            public void onResponse(Call<RouteResponse> call, Response<RouteResponse> response) {
+            public void onResponse(@NonNull Call<RouteResponse> call, @NonNull Response<RouteResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d("API", "Route : From : " + response.body().data.orig_en);
                     Log.d("API", "Route : To : " + response.body().data.dest_en);
+                    title.setText(String.format("%s -> %s", response.body().data.orig_en, response.body().data.dest_en));
                 }
             }
 
             @Override
-            public void onFailure(Call<RouteResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<RouteResponse> call, @NonNull Throwable t) {
                 Log.e("API_ERROR", "Route : Failed to load data", t);
             }
         });
+    }
 
+    private void getRouteData() {
         apiService.getRouteStop(route, direction, serviceType).enqueue(new Callback<RouteStopResponse>() {
             @Override
-            public void onResponse(Call<RouteStopResponse> call, Response<RouteStopResponse> response) {
+            public void onResponse(@NonNull Call<RouteStopResponse> call, @NonNull Response<RouteStopResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<String> stopIds = response.body().data.stream().map(d -> d.stop).collect(Collectors.toList());
                     for (String stopId : stopIds) {
                         apiService.getStopData(stopId).enqueue(new Callback<StopResponse>() {
                             @Override
-                            public void onResponse(Call<StopResponse> call, Response<StopResponse> response) {
+                            public void onResponse(@NonNull Call<StopResponse> call, @NonNull Response<StopResponse> response) {
                                 if (response.isSuccessful() && response.body() != null) {
-                                    Log.d("API", "Stop : " + response.body().data.name_en);
-                                    Log.d("API", "Stop Lat : " + response.body().data.lat);
-                                    Log.d("API", "Stop Long : " + response.body().data.lon);
+                                    Log.d(TAG, "Stop : " + response.body().data.name_en);
+                                    Log.d(TAG, "Stop Lat : " + response.body().data.lat);
+                                    Log.d(TAG, "Stop Long : " + response.body().data.lon);
+                                    Log.d(TAG, "Stop Lat,Long : " + response.body().data.lat + "," + response.body().data.lon);
+                                    stopDataList.add(response.body().data);
+                                    if (stopDataList.size() == stopIds.size())
+                                        drawRouteOnMap(stopDataList);
                                 }
                             }
 
                             @Override
-                            public void onFailure(Call<StopResponse> call, Throwable t) {
-                                Log.e("API_ERROR", "Stop : Failed to load data", t);
+                            public void onFailure(@NonNull Call<StopResponse> call, @NonNull Throwable t) {
+                                Log.e(TAG, "Stop : Failed to load data", t);
                             }
                         });
 
                         apiService.getStopETAData(stopId, route, serviceType).enqueue(new Callback<StopETAResponse>() {
                             @Override
-                            public void onResponse(Call<StopETAResponse> call, Response<StopETAResponse> response) {
+                            public void onResponse(@NonNull Call<StopETAResponse> call, @NonNull Response<StopETAResponse> response) {
                                 if (response.isSuccessful() && response.body() != null) {
                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
                                     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -134,7 +177,7 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
                                     for (StopETAResponse.StopETAData eta : data) {
                                         if (eta.eta != null && !eta.eta.isEmpty()) {
                                             try {
-                                                Log.d("API", "Stop ETA : " + eta.eta_seq + ":::" + sdf.parse(eta.eta));
+                                                Log.d(TAG, "Stop ETA : " + eta.eta_seq + ":::" + sdf.parse(eta.eta));
                                             } catch (ParseException e) {
                                                 throw new RuntimeException(e);
                                             }
@@ -147,7 +190,7 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
                             }
 
                             @Override
-                            public void onFailure(Call<StopETAResponse> call, Throwable t) {
+                            public void onFailure(@NonNull Call<StopETAResponse> call, @NonNull Throwable t) {
 
                             }
                         });
@@ -157,24 +200,142 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
 
             @Override
             public void onFailure(Call<RouteStopResponse> call, Throwable t) {
-                Log.e("API_ERROR", "Route Stop : Failed to load data", t);
+                Log.e(TAG, "Route Stop : Failed to load data", t);
             }
         });
+    }
 
-        findViewById(R.id.back_button).setOnClickListener(v -> onBackPressed());
+    private void drawRouteOnMap(List<StopResponse.StopData> stopDataList) {
 
-        btnToggleLocation = findViewById(R.id.btnToggleLocation);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        // move camera to first bus stop
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(stopDataList.get(0).getLatLng(), 13));
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
+        // add marker
+        for (StopResponse.StopData stop : stopDataList) {
+            mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.name_en));
         }
 
-        btnToggleLocation.setOnClickListener(v -> toggleUserLocation());
+        // fetch Directions
+        new FetchRouteTask().execute(getDirectionsUrl(stopDataList.stream().map(StopResponse.StopData::getLatLng).collect(Collectors.toList())));
 
+//        List<LatLng> routePoints = stopDataList.stream().map(StopResponse.StopData::getLatLng).collect(Collectors.toList());
+//        for (int i = 0; i < routePoints.size() - 1; i++) {
+//            LatLng start = routePoints.get(i);
+//            LatLng end = routePoints.get(i + 1);
+//
+//            new FetchRouteTask().execute(getDirectionsUrlForTwoPoint(start, end));
+//        }
 
+    }
+
+    private String getDirectionsUrlForTwoPoint(LatLng origin, LatLng destination) {
+        return "https://maps.googleapis.com/maps/api/directions/json?"
+                + "origin=" + origin.latitude + "," + origin.longitude
+                + "&destination=" + destination.latitude + "," + destination.longitude
+                + "&mode=driving"
+                + "&key=AIzaSyBP10JHjUiM6UuBzG7K1-IRCz5npFcCMOk";
+    }
+
+    private String getDirectionsUrl(List<LatLng> routePoints) {
+
+        Log.d(TAG, "size : " + routePoints.size());
+
+        if (routePoints.size() < 2) return null;
+
+        LatLng origin = routePoints.get(0);
+        LatLng destination = routePoints.get(routePoints.size() - 1);
+
+        StringBuilder waypoints = new StringBuilder();
+        if (routePoints.size() > 2) {
+            waypoints.append("&waypoints=");
+            for (int i = 1; i < routePoints.size() - 1; i++) {
+                LatLng point = routePoints.get(i);
+                waypoints.append(point.latitude).append(",").append(point.longitude);
+                if (i < routePoints.size() - 2) {
+                    waypoints.append("|");
+                }
+            }
+        }
+
+        String url = "https://maps.googleapis.com/maps/api/directions/json?"
+                + "origin=" + origin.latitude + "," + origin.longitude
+                + "&destination=" + destination.latitude + "," + destination.longitude
+                + waypoints.toString()
+                + "&mode=driving"
+//                + "&mode=transit"
+//                + "&transit_mode=train|tram|subway"
+                + "&key=AIzaSyBP10JHjUiM6UuBzG7K1-IRCz5npFcCMOk";
+
+        Log.d(TAG, url);
+
+        return url;
+    }
+
+    private class FetchRouteTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                URL url = new URL(urls[0]);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                return response.toString();
+            } catch (Exception e) {
+                Log.e(TAG, "Error fetching route", e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                Log.d(TAG, "onPostExecute");
+                Log.d(TAG, result);
+                drawRoute(result);
+            }
+        }
+    }
+
+    private void drawRoute(String jsonData) {
+        try {
+            JSONArray routes = new JSONObject(jsonData).getJSONArray("routes");
+            if (routes.length() > 0) {
+                JSONArray legs = routes.getJSONObject(0).getJSONArray("legs");
+
+                for (int i = 0; i < legs.length(); i++) {
+                    JSONArray steps = legs.getJSONObject(i).getJSONArray("steps");
+                    List<LatLng> path = new ArrayList<>();
+
+                    for (int j = 0; j < steps.length(); j++) {
+                        JSONObject step = steps.getJSONObject(j);
+
+                        JSONObject startLocation = step.getJSONObject("start_location");
+                        LatLng startLatLng = new LatLng(startLocation.getDouble("lat"), startLocation.getDouble("lng"));
+
+                        JSONObject endLocation = step.getJSONObject("end_location");
+                        LatLng endLatLng = new LatLng(endLocation.getDouble("lat"), endLocation.getDouble("lng"));
+
+                        path.add(startLatLng);
+                        path.add(endLatLng);
+                    }
+
+                    mMap.addPolyline(new PolylineOptions()
+                            .addAll(path)
+                            .width(12f)
+                            .color(Color.RED));
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error parsing route", e);
+        }
     }
 
     @Override
@@ -189,14 +350,11 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
             enableUserLocation();
         }
 
-        List<LatLng> busRoute = Arrays.asList(
-                new LatLng(22.3193, 114.1694),
-                new LatLng(22.3283, 114.1925)
-        );
+        getRouteData();
 
-        mMap.addPolyline(new PolylineOptions().addAll(busRoute).width(12f).color(Color.RED));
-        for (LatLng stop : busRoute) {
-            mMap.addMarker(new MarkerOptions().position(stop).title("巴士站"));
+        mMap.addPolyline(new PolylineOptions().addAll(stopDataList.stream().map(StopResponse.StopData::getLatLng).collect(Collectors.toList())).width(12f).color(Color.RED));
+        for (StopResponse.StopData stop : stopDataList) {
+            mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.name_en));
         }
 
         mMap.setOnInfoWindowClickListener(marker -> new BusStopDialogFragment(marker.getTitle()).show(getSupportFragmentManager(), "busStopDialog"));
@@ -221,18 +379,12 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
         btnToggleLocation.setImageResource(R.drawable.ic_location_on);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
             if (location != null) {
                 LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                Log.d("Location", String.format("My Location : %s ;;; %s", location.getLatitude(), location.getLongitude()));
                 if (userMarker != null) userMarker.remove();
                 userMarker = mMap.addMarker(new MarkerOptions().position(userLocation).title("你的位置"));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
