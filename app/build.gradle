@@ -34,6 +34,8 @@ dependencies {
     implementation libs.material
     implementation 'androidx.activity:activity:1.9.0' // Use an older version
     implementation libs.constraintlayout
+    implementation libs.play.services.location
+    implementation libs.play.services.maps
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
