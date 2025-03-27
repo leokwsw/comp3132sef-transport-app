@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#0D47A1"
-        android:padding="16dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:padding="16dp">
 
-        <ImageButton
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/back_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -23,60 +25,59 @@
             android:src="@drawable/ic_arrow_back"
             app:tint="#FFFFFF" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/route_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Route Name"
+            android:textColor="#FFFFFF"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"/>
+            android:textStyle="bold" />
 
-        <ImageButton
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/bookmark_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_bookmark_outline"
             android:contentDescription="Bookmark route"
+            android:src="@drawable/ic_bookmark_outline"
             app:tint="#FFFFFF" />
-    </LinearLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@android:color/white">
+        android:layout_height="500dp">
 
-        <LinearLayout
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="match_parent"
+            tools:context=".DetailsActivity" />
 
-            <FrameLayout
-                android:id="@+id/map_container"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:background="#E0E0E0">
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btnToggleLocation"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="16dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_location_off"
+            android:tint="@android:color/holo_blue_dark" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Map Placeholder"
-                    android:textSize="16sp"
-                    android:textColor="#757575"
-                    android:layout_gravity="center"/>
-            </FrameLayout>
+    </RelativeLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/stop_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-        </LinearLayout>
-    </ScrollView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/stop_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="40"
+        tools:listitem="@layout/stop_item" />
 
-</LinearLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>
