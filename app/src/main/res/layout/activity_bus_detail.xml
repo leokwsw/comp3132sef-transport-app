@@ -78,6 +78,6 @@
         android:layout_margin="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="40"
-        tools:listitem="@layout/route_item" />
+        tools:listitem="@layout/stop_item" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -9,7 +9,7 @@ public class RouteStopResponse {
         public String route;
         public String bound;
         public String service_type;
-        public String seq_type;
+        public String seq;
         public String stop;
     }
 }
