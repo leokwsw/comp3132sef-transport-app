@@ -7,6 +7,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
@@ -80,6 +83,7 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
     private Marker userMarker;
 
     private AppCompatTextView title;
+    private EditText searchBar;
 
     private KmbApiService apiService;
     private List<StopResponse.StopData> stopDataList = new ArrayList<>();
@@ -96,6 +100,8 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
         apiService = RetrofitClient.getService();
         // init ui components
         title = findViewById(R.id.route_name);
+        searchBar = findViewById(R.id.search_bar);
+        setupSearch();
 
 //        if (getIntent().getExtras() != null) {
 //            route = getIntent().getExtras().getString(ROUTE_KEY);
@@ -134,6 +140,20 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
 
     }
 
+    private void setupSearch() {
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                detailsAdapter.searchStops(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
     private void setTitle() {
         apiService.getRoute(route, direction, serviceType).enqueue(new Callback<RouteResponse>() {
             @Override

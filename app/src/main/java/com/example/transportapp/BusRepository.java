@@ -11,21 +11,52 @@ public class BusRepository {
         busRoutes.add(new BusRoute("A30", "Airport Express", "A-B-C"));
     }
 
+    public static void setRoutes(List<BusRoute> routes) {
+        busRoutes = new ArrayList<>(routes);
+    }
+
     public static List<BusRoute> searchRoutes(String query) {
         List<BusRoute> results = new ArrayList<>();
-        String[] keywords = query.toLowerCase().split(" ");
+        if (query.isEmpty()) {
+            results.addAll(busRoutes);
+            return results;
+        }
+
+        String lowercaseQuery = query.toLowerCase();
+        for (BusRoute route : busRoutes) {
+            if (route.getNumber().toLowerCase().contains(lowercaseQuery) ||
+                    route.getRouteName().toLowerCase().contains(lowercaseQuery)) {
+                results.add(route);
+            }
+        }
+        return results;
+    }
+
+    public static List<BusRoute> filterRoutes(String query, boolean nightBusOnly, boolean expressBusOnly, boolean airportBusOnly) {
+        List<BusRoute> results = new ArrayList<>();
+        String lowercaseQuery = query.toLowerCase();
 
         for (BusRoute route : busRoutes) {
-            boolean matchAll = true;
-            for (String keyword : keywords) {
-                if (!(route.getNumber().toLowerCase().contains(keyword) ||
-                        route.getRouteName().toLowerCase().contains(keyword) ||
-                        route.getStops().toLowerCase().contains(keyword))) {
-                    matchAll = false;
-                    break;
-                }
+            // Apply text search filter
+            boolean matchesSearch = query.isEmpty() ||
+                    route.getNumber().toLowerCase().contains(lowercaseQuery) ||
+                    route.getRouteName().toLowerCase().contains(lowercaseQuery);
+
+            // Apply type filters
+            boolean matchesType = true;
+            if (nightBusOnly && !route.getNumber().startsWith("N")) {
+                matchesType = false;
             }
-            if (matchAll) results.add(route);
+            if (expressBusOnly && !route.getNumber().startsWith("E")) {
+                matchesType = false;
+            }
+            if (airportBusOnly && !route.getNumber().startsWith("A")) {
+                matchesType = false;
+            }
+
+            if (matchesSearch && matchesType) {
+                results.add(route);
+            }
         }
         return results;
     }

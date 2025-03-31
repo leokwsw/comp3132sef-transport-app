@@ -55,15 +55,15 @@
             android:textColor="#000000"
             android:textColorHint="#757575"/>
 
-        <ToggleButton
-            android:id="@+id/night_bus_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:id="@+id/filter_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginStart="8dp"
-            android:textOn="Night Bus: On"
-            android:textOff="Night Bus: Off"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#0D47A1"/>
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            android:contentDescription="Filter"
+            app:tint="#0D47A1"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
