@@ -100,8 +100,8 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
         apiService = RetrofitClient.getService();
         // init ui components
         title = findViewById(R.id.route_name);
-        searchBar = findViewById(R.id.search_bar);
-        setupSearch();
+//        searchBar = findViewById(R.id.search_bar);
+//        setupSearch();
 
 //        if (getIntent().getExtras() != null) {
 //            route = getIntent().getExtras().getString(ROUTE_KEY);
