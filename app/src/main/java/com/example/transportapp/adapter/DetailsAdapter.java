@@ -78,16 +78,22 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsI
         ArrayList<String> etaText = new ArrayList<>();
         for (StopETAResponse.StopETAData etaData : filteredItems.get(position).etaData) {
             long time = Time.getMinutesDifference(etaData.eta);
-            String format = "%s ";
-            if (time > 1) {
-                format += "Minutes";
+            if (time == -1) {
+                etaText.add("No Scheduled Bus");
             } else {
-                format += "Minute";
+
+                String format = "%s ";
+
+                if (time > 1) {
+                    format += "Minutes";
+                } else {
+                    format += "Minute";
+                }
+                if (!etaData.rmk_en.isEmpty()) {
+                    format += " -- %s";
+                }
+                etaText.add(String.format(format, time, etaData.rmk_en));
             }
-            if (!etaData.rmk_en.isEmpty()) {
-                format += " -- %s";
-            }
-            etaText.add(String.format(format, time, etaData.rmk_en));
         }
         holder.tvEtaTime.setText(String.join("\n", etaText));
     }

@@ -15,6 +15,10 @@ public class Time {
     public static long getMinutesDifference(String timeStr) {
         Log.d("Time", String.format("timeStr : %s", timeStr));
 
+        if(timeStr == null){
+            return -1;
+        }
+
         long minutesDifference = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ZonedDateTime targetTime = ZonedDateTime.parse(timeStr);

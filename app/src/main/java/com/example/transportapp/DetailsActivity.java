@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,6 +18,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,7 +63,7 @@ import retrofit2.Response;
 
 public class DetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private final String TAG = "Amomo";
+    private final String TAG = this.getClass().toString();
     public static String ROUTE_KEY = "route";
     public static String DIRECTION_KEY = "direction";
     public static String DIRECTION_OUTBOUND = "outbound";
@@ -82,7 +85,6 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
     private static final int LOCATION_REQUEST_CODE = 100;
     private Marker userMarker;
 
-    private AppCompatTextView title;
     private EditText searchBar;
 
     private KmbApiService apiService;
@@ -98,15 +100,23 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.activity_bus_detail);
         // init network service
         apiService = RetrofitClient.getService();
-        // init ui components
-        title = findViewById(R.id.route_name);
+
 //        searchBar = findViewById(R.id.search_bar);
 //        setupSearch();
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
+
 
         if (getIntent().getExtras() != null) {
             route = getIntent().getExtras().getString(ROUTE_KEY);
             direction = getIntent().getExtras().getString(DIRECTION_KEY);
             serviceType = getIntent().getExtras().getString(SERVICE_TYPE_KEY);
+
+            Log.d(TAG, String.format("Route : %s ;;; Direction : %s ;;; ServiceType : %s", route, direction, serviceType));
 
             if (
                     route == null || route.isEmpty() ||
@@ -122,7 +132,7 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
         setTitle();
 
 
-        findViewById(R.id.back_button).setOnClickListener(v -> onBackPressed());
+//        findViewById(R.id.back_button).setOnClickListener(v -> onBackPressed());
 
         btnToggleLocation = findViewById(R.id.btnToggleLocation);
         btnToggleLocation.setVisibility(View.GONE);
@@ -140,10 +150,24 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.detail_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
     private void setupSearch() {
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -151,15 +175,17 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
     }
+
     private void setTitle() {
         apiService.getRoute(route, direction, serviceType).enqueue(new Callback<RouteResponse>() {
             @Override
             public void onResponse(@NonNull Call<RouteResponse> call, @NonNull Response<RouteResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    title.setText(String.format("%s : %s -> %s", route, response.body().data.orig_en, response.body().data.dest_en));
+                    Objects.requireNonNull(getSupportActionBar()).setTitle(String.format("%s : %s -> %s", route, response.body().data.orig_en, response.body().data.dest_en));
                 }
             }
 
@@ -243,8 +269,20 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
             mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.name_en));
         }
 
+        List<LatLng> points = stopDataList.stream().map(StopResponse.StopData::getLatLng).collect(Collectors.toList());
+
         // fetch Directions
-        new FetchRouteTask().execute(getDirectionsUrl(stopDataList.stream().map(StopResponse.StopData::getLatLng).collect(Collectors.toList())));
+        int size = 5;
+
+        for (int i = 0; i < points.size(); i += (size - 1)) {
+            List<LatLng> tmpPoints = new ArrayList<>();
+            for (int j = i; j < i + size && j < points.size(); j++) {
+                tmpPoints.add(points.get(j));
+            }
+            new FetchRouteTask().execute(getDirectionsUrl(tmpPoints));
+            if (i + size >= points.size()) break;
+        }
+
     }
 
     private String getDirectionsUrl(List<LatLng> routePoints) {
@@ -290,7 +328,7 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
                     response.append(line);
                 }
                 reader.close();
-
+                Log.d(TAG, "fetching route : " + response.toString());
                 return response.toString();
             } catch (Exception e) {
                 Log.e(TAG, "Error fetching route", e);
