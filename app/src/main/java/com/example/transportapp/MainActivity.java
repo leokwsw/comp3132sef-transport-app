@@ -5,19 +5,22 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.transportapp.adapter.BusAdapter;
 import com.example.transportapp.model.kmb.RouteListResponse;
 import com.example.transportapp.network.KmbApiService;
 import com.example.transportapp.network.RetrofitClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -26,31 +29,16 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     private BusAdapter adapter;
-    private EditText searchInput;
+    private AppCompatEditText searchInput;
     private KmbApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        KmbApiService apiService = RetrofitClient.getService();
-//        apiService.getRoutes().enqueue(new Callback<RouteListResponse>() {
-//            @Override
-//            public void onResponse(Call<RouteListResponse> call, Response<RouteListResponse> response) {
-//                if (response.isSuccessful() && response.body() != null) {
-//                    for (RouteListResponse.Route route : response.body().data) {
-//                        Log.d("API", "Route: " + route.route + ", From: " + route.orig_en + " To: " + route.dest_en);
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<RouteListResponse> call, Throwable t) {
-//                Log.e("API_ERROR", "Failed to load data", t);
-//            }
-//        });
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Initialize API service
         apiService = RetrofitClient.getService();
@@ -58,7 +46,13 @@ public class MainActivity extends AppCompatActivity {
         // Setup RecyclerView
         RecyclerView recyclerView = findViewById(R.id.route_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new BusAdapter(new ArrayList<>());
+        adapter = new BusAdapter(new ArrayList<>(), busRoute -> {
+            Intent intent = new Intent(this, DetailsActivity.class);
+            intent.putExtra(DetailsActivity.ROUTE_KEY, busRoute.route);
+            intent.putExtra(DetailsActivity.SERVICE_TYPE_KEY, busRoute.service_type);
+            intent.putExtra(DetailsActivity.DIRECTION_KEY, Objects.equals(busRoute.bound, "O") ? DetailsActivity.DIRECTION_OUTBOUND : DetailsActivity.DIRECTION_INBOUND);
+            startActivity(intent);
+        });
         recyclerView.setAdapter(adapter);
 
         searchInput = findViewById(R.id.search_bar);
@@ -68,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
     private void setupSearch() {
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -76,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         // Setup search bar
@@ -91,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void performSearch(String query) {
-        List<BusRoute> results;
+        List<RouteListResponse.Route> results;
         if (query.isEmpty()) {
             results = new ArrayList<>();
         } else {
@@ -105,12 +101,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<RouteListResponse> call, Response<RouteListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<BusRoute> routes = new ArrayList<>();
-                    for (RouteListResponse.Route route : response.body().data) {
-                        routes.add(new BusRoute(route.route, route.orig_en + " → " + route.dest_en, ""));
-                    }
-                    BusRepository.setRoutes(routes);
-                    adapter.updateData(routes);
+                    BusRepository.setRoutes(response.body().data);
+                    adapter.updateData(response.body().data);
                 }
             }
 

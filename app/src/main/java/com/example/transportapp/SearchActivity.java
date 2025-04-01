@@ -1,5 +1,6 @@
 package com.example.transportapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.transportapp.adapter.BusAdapter;
 import com.example.transportapp.model.kmb.RouteListResponse;
 import com.example.transportapp.network.KmbApiService;
 import com.example.transportapp.network.RetrofitClient;
@@ -44,7 +46,13 @@ public class SearchActivity extends AppCompatActivity implements FilterDialog.Fi
         // Setup RecyclerView
         RecyclerView recyclerView = findViewById(R.id.search_results);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new BusAdapter(new ArrayList<>());
+        adapter = new BusAdapter(new ArrayList<>(), busRoute -> {
+            Intent intent = new Intent(this, DetailsActivity.class);
+            intent.putExtra(DetailsActivity.ROUTE_KEY, busRoute.route);
+            intent.putExtra(DetailsActivity.SERVICE_TYPE_KEY, busRoute.service_type);
+            intent.putExtra(DetailsActivity.DIRECTION_KEY, busRoute.bound == "O" ? DetailsActivity.DIRECTION_OUTBOUND : DetailsActivity.DIRECTION_INBOUND);
+            startActivity(intent);
+        });
         recyclerView.setAdapter(adapter);
 
         // Setup back button
@@ -58,13 +66,14 @@ public class SearchActivity extends AppCompatActivity implements FilterDialog.Fi
 
     private void showFilterDialog() {
         new FilterDialog(this, nightBusOnly, expressBusOnly, airportBusOnly)
-            .show(getSupportFragmentManager(), "filter_dialog");
+                .show(getSupportFragmentManager(), "filter_dialog");
     }
 
     private void setupSearch() {
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -72,16 +81,17 @@ public class SearchActivity extends AppCompatActivity implements FilterDialog.Fi
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
     }
 
     private void performSearch(String query) {
-        List<BusRoute> filteredRoutes = BusRepository.filterRoutes(
-            query,
-            nightBusOnly,
-            expressBusOnly,
-            airportBusOnly
+        List<RouteListResponse.Route> filteredRoutes = BusRepository.filterRoutes(
+                query,
+                nightBusOnly,
+                expressBusOnly,
+                airportBusOnly
         );
         adapter.updateData(filteredRoutes);
     }
@@ -91,11 +101,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialog.Fi
             @Override
             public void onResponse(Call<RouteListResponse> call, Response<RouteListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<BusRoute> routes = new ArrayList<>();
-                    for (RouteListResponse.Route route : response.body().data) {
-                        routes.add(new BusRoute(route.route, route.orig_en + " → " + route.dest_en, ""));
-                    }
-                    BusRepository.setRoutes(routes);
+                    BusRepository.setRoutes(response.body().data);
                     performSearch(searchInput.getText().toString());
                 }
             }

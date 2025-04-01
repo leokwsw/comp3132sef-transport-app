@@ -1,4 +1,4 @@
-package com.example.transportapp;
+package com.example.transportapp.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,24 +7,31 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.transportapp.R;
+import com.example.transportapp.model.kmb.RouteListResponse;
+
 import java.util.List;
 
 public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder> {
-    private List<BusRoute> routes;
+    private List<RouteListResponse.Route> routes;
+    private BusAdapterCallback callback;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView tvNumber, tvRouteName, tvStops;
+        public View itemView;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            this.itemView = itemView;
             tvNumber = itemView.findViewById(R.id.tvNumber);
             tvRouteName = itemView.findViewById(R.id.tvRouteName);
             tvStops = itemView.findViewById(R.id.tvStops);
         }
     }
 
-    public BusAdapter(List<BusRoute> routes) {
+    public BusAdapter(List<RouteListResponse.Route> routes, BusAdapterCallback callback) {
         this.routes = routes;
+        this.callback = callback;
     }
 
     @Override
@@ -36,10 +43,16 @@ public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        BusRoute route = routes.get(position);
-        holder.tvNumber.setText(route.getNumber());
-        holder.tvRouteName.setText(route.getRouteName());
-        holder.tvStops.setText(route.getStops());
+        RouteListResponse.Route route = routes.get(position);
+        holder.tvNumber.setText(route.route);
+        holder.tvRouteName.setText(route.orig_en + " → " + route.dest_en);
+        holder.tvStops.setText("");
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.onClick(route);
+            }
+        });
     }
 
     @Override
@@ -47,8 +60,8 @@ public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder> {
         return routes.size();
     }
 
-    public void updateData(List<BusRoute> newRoutes) {
+    public void updateData(List<RouteListResponse.Route> newRoutes) {
         routes = newRoutes;
-        notifyDataSetChanged();
+        notifyItemRangeChanged(0, newRoutes.size());
     }
 }
