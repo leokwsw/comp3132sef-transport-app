@@ -5,10 +5,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +20,7 @@ import com.example.transportapp.network.RetrofitClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,14 +29,16 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     private BusAdapter adapter;
-    private EditText searchInput;
+    private AppCompatEditText searchInput;
     private KmbApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Initialize API service
         apiService = RetrofitClient.getService();
@@ -46,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, DetailsActivity.class);
             intent.putExtra(DetailsActivity.ROUTE_KEY, busRoute.route);
             intent.putExtra(DetailsActivity.SERVICE_TYPE_KEY, busRoute.service_type);
-            intent.putExtra(DetailsActivity.DIRECTION_KEY, busRoute.bound == "O" ? DetailsActivity.DIRECTION_OUTBOUND : DetailsActivity.DIRECTION_INBOUND);
+            intent.putExtra(DetailsActivity.DIRECTION_KEY, Objects.equals(busRoute.bound, "O") ? DetailsActivity.DIRECTION_OUTBOUND : DetailsActivity.DIRECTION_INBOUND);
             startActivity(intent);
         });
         recyclerView.setAdapter(adapter);
