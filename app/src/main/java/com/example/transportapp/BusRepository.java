@@ -1,56 +1,53 @@
 package com.example.transportapp;
 
+import com.example.transportapp.model.kmb.RouteListResponse;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class BusRepository {
-    private static List<BusRoute> busRoutes = new ArrayList<>();
+    private static List<RouteListResponse.Route> busRoutes = new ArrayList<>();
 
-    static {
-        // test
-        busRoutes.add(new BusRoute("A30", "Airport Express", "A-B-C"));
-    }
-
-    public static void setRoutes(List<BusRoute> routes) {
+    public static void setRoutes(List<RouteListResponse.Route> routes) {
         busRoutes = new ArrayList<>(routes);
     }
 
-    public static List<BusRoute> searchRoutes(String query) {
-        List<BusRoute> results = new ArrayList<>();
+    public static List<RouteListResponse.Route> searchRoutes(String query) {
+        List<RouteListResponse.Route> results = new ArrayList<>();
         if (query.isEmpty()) {
             results.addAll(busRoutes);
             return results;
         }
 
         String lowercaseQuery = query.toLowerCase();
-        for (BusRoute route : busRoutes) {
-            if (route.getNumber().toLowerCase().contains(lowercaseQuery) ||
-                    route.getRouteName().toLowerCase().contains(lowercaseQuery)) {
+        for (RouteListResponse.Route route : busRoutes) {
+            if (route.route.toLowerCase().contains(lowercaseQuery) ||
+                    String.format("%s", route.orig_en + " → " + route.dest_en).toLowerCase().contains(lowercaseQuery)) {
                 results.add(route);
             }
         }
         return results;
     }
 
-    public static List<BusRoute> filterRoutes(String query, boolean nightBusOnly, boolean expressBusOnly, boolean airportBusOnly) {
-        List<BusRoute> results = new ArrayList<>();
+    public static List<RouteListResponse.Route> filterRoutes(String query, boolean nightBusOnly, boolean expressBusOnly, boolean airportBusOnly) {
+        List<RouteListResponse.Route> results = new ArrayList<>();
         String lowercaseQuery = query.toLowerCase();
 
-        for (BusRoute route : busRoutes) {
+        for (RouteListResponse.Route route : busRoutes) {
             // Apply text search filter
             boolean matchesSearch = query.isEmpty() ||
-                    route.getNumber().toLowerCase().contains(lowercaseQuery) ||
-                    route.getRouteName().toLowerCase().contains(lowercaseQuery);
+                    route.route.toLowerCase().contains(lowercaseQuery) ||
+                    String.format("%s", route.orig_en + " → " + route.dest_en).toLowerCase().contains(lowercaseQuery);
 
             // Apply type filters
             boolean matchesType = true;
-            if (nightBusOnly && !route.getNumber().startsWith("N")) {
+            if (nightBusOnly && !route.route.startsWith("N")) {
                 matchesType = false;
             }
-            if (expressBusOnly && !route.getNumber().startsWith("E")) {
+            if (expressBusOnly && !route.route.startsWith("E")) {
                 matchesType = false;
             }
-            if (airportBusOnly && !route.getNumber().startsWith("A")) {
+            if (airportBusOnly && !route.route.startsWith("A")) {
                 matchesType = false;
             }
 

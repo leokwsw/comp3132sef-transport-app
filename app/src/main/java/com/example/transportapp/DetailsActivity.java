@@ -67,13 +67,13 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
     public static String DIRECTION_INBOUND = "inbound";
     public static String SERVICE_TYPE_KEY = "service_type";
 
-//    private String route = "";
-//    private String direction = "";
-//    private String serviceType = "";
+    private String route = "";
+    private String direction = "";
+    private String serviceType = "";
 
-    private String route = "17";
-    private String direction = "outbound";
-    private String serviceType = "1";
+//    private String route = "17";
+//    private String direction = "outbound";
+//    private String serviceType = "1";
 
     private GoogleMap mMap;
     private ImageButton btnToggleLocation;
@@ -103,21 +103,21 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
 //        searchBar = findViewById(R.id.search_bar);
 //        setupSearch();
 
-//        if (getIntent().getExtras() != null) {
-//            route = getIntent().getExtras().getString(ROUTE_KEY);
-//            direction = getIntent().getExtras().getString(DIRECTION_KEY);
-//            serviceType = getIntent().getExtras().getString(SERVICE_TYPE_KEY);
-//
-//            if (
-//                    route == null || route.isEmpty() ||
-//                            direction == null || direction.isEmpty() ||
-//                            serviceType == null || serviceType.isEmpty()
-//            ) {
-//                onBackPressed();
-//            }
-//        } else {
-//            onBackPressed();
-//        }
+        if (getIntent().getExtras() != null) {
+            route = getIntent().getExtras().getString(ROUTE_KEY);
+            direction = getIntent().getExtras().getString(DIRECTION_KEY);
+            serviceType = getIntent().getExtras().getString(SERVICE_TYPE_KEY);
+
+            if (
+                    route == null || route.isEmpty() ||
+                            direction == null || direction.isEmpty() ||
+                            serviceType == null || serviceType.isEmpty()
+            ) {
+                onBackPressed();
+            }
+        } else {
+            onBackPressed();
+        }
 
         setTitle();
 
