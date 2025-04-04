@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,16 +50,30 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.route_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new BusAdapter(new ArrayList<>(), busRoute -> {
-            Intent intent = new Intent(this, DetailsActivity.class);
+            Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
             intent.putExtra(DetailsActivity.ROUTE_KEY, busRoute.route);
             intent.putExtra(DetailsActivity.SERVICE_TYPE_KEY, busRoute.service_type);
             intent.putExtra(DetailsActivity.DIRECTION_KEY, Objects.equals(busRoute.bound, "O") ? DetailsActivity.DIRECTION_OUTBOUND : DetailsActivity.DIRECTION_INBOUND);
             startActivity(intent);
-        });
+        }, this);
         recyclerView.setAdapter(adapter);
 
+        // Setup search input
         searchInput = findViewById(R.id.search_bar);
+        Button bookmarkButton = findViewById(R.id.bookmark_button);
+
+        searchInput.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+            startActivity(intent);
+        });
+
+        bookmarkButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+            startActivity(intent);
+        });
+
         setupSearch();
+        loadRoutes();
     }
 
     private void setupSearch() {
@@ -74,16 +91,6 @@ public class MainActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
-
-        // Setup search bar
-        searchInput = findViewById(R.id.search_bar);
-        searchInput.setOnClickListener(v -> {
-            Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
-        });
-
-        // Load initial data
-        loadRoutes();
     }
 
     private void performSearch(String query) {
