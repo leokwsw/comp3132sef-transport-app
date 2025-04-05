@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -68,9 +67,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         bookmarkButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+            Intent intent = new Intent(MainActivity.this, BookmarkActivity.class);
             startActivity(intent);
         });
+
+        findViewById(R.id.nearby_button).setOnClickListener(v -> startActivity(new Intent(MainActivity.this, NearbyActivity.class)));
 
         setupSearch();
         loadRoutes();

@@ -1,12 +1,11 @@
-<androidx.appcompat.widget.LinearLayoutCompat
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingBottom="16dp"
-    tools:context=".MainActivity2">
+    tools:context=".BookmarkActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -18,17 +17,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#0D47A1"
-            android:padding="16dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:padding="16dp">
 
             <ImageButton
                 android:id="@+id/back_button"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_arrow_back"
                 android:contentDescription="Back"
+                android:src="@drawable/ic_arrow_back"
                 app:tint="#FFFFFF" />
 
             <TextView
@@ -36,19 +35,19 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Bookmarks Routes"
+                android:text="Nearby Routes"
+                android:textColor="#FFFFFF"
                 android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"/>
+                android:textStyle="bold" />
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/bookmarks_list"
+        android:id="@+id/nearby_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/bookmark_item" />
+        tools:listitem="@layout/nearby_bus_item" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

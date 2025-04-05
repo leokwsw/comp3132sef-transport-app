@@ -26,6 +26,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.transportapp.adapter.DetailsAdapter;
 import com.example.transportapp.model.kmb.RouteResponse;
 import com.example.transportapp.model.kmb.RouteStopResponse;
+import com.example.transportapp.model.kmb.StopData;
+import com.example.transportapp.model.kmb.StopETAData;
 import com.example.transportapp.model.kmb.StopETAResponse;
 import com.example.transportapp.model.kmb.StopResponse;
 import com.example.transportapp.model.view.BusStopModel;
@@ -88,7 +90,6 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
     private EditText searchBar;
 
     private KmbApiService apiService;
-    private List<StopResponse.StopData> stopDataList = new ArrayList<>();
 
     private List<BusStopModel> items = new ArrayList<>();
     private DetailsAdapter detailsAdapter = new DetailsAdapter();
@@ -207,14 +208,14 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
                             @Override
                             public void onResponse(@NonNull Call<StopResponse> call, @NonNull Response<StopResponse> response) {
                                 if (response.isSuccessful() && response.body() != null) {
-                                    StopResponse.StopData stopData = response.body().data;
+                                    StopData stopData = response.body().data;
                                     apiService.getStopETAData(stopData.stop, route, serviceType).enqueue(new Callback<StopETAResponse>() {
                                         @Override
                                         public void onResponse(@NonNull Call<StopETAResponse> call, @NonNull Response<StopETAResponse> response) {
                                             if (response.isSuccessful() && response.body() != null) {
                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.CHINESE);
                                                 sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-                                                List<StopETAResponse.StopETAData> data = response.body().data;
+                                                List<StopETAData> data = response.body().data;
 
                                                 data = data.stream().filter(d -> Objects.equals(d.service_type, serviceType)).collect(Collectors.toList());
                                                 data = data.stream().filter(d -> Objects.equals(d.dir, "O")).collect(Collectors.toList());
@@ -259,17 +260,17 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
         });
     }
 
-    private void drawRouteOnMap(List<StopResponse.StopData> stopDataList) {
+    private void drawRouteOnMap(List<StopData> stopDataList) {
 
         // move camera to first bus stop
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(stopDataList.get(0).getLatLng(), 13));
 
         // add marker
-        for (StopResponse.StopData stop : stopDataList) {
+        for (StopData stop : stopDataList) {
             mMap.addMarker(new MarkerOptions().position(stop.getLatLng()).title(stop.name_en));
         }
 
-        List<LatLng> points = stopDataList.stream().map(StopResponse.StopData::getLatLng).collect(Collectors.toList());
+        List<LatLng> points = stopDataList.stream().map(StopData::getLatLng).collect(Collectors.toList());
 
         // fetch Directions
         int size = 5;

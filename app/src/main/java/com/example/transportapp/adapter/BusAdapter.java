@@ -20,8 +20,8 @@ import java.util.List;
 
 public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder> {
     private List<RouteListResponse.Route> routes;
-    private BusAdapterCallback callback;
-    private BookmarkManager bookmarkManager;
+    private final BusAdapterCallback callback;
+    private final BookmarkManager bookmarkManager;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView tvNumber, tvRouteName, tvStops;
