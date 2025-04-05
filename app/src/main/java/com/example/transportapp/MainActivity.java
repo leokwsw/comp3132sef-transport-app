@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
@@ -69,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, BookmarkActivity.class);
             startActivity(intent);
         });
+
+        findViewById(R.id.nearby_button).setOnClickListener(v -> startActivity(new Intent(MainActivity.this, NearbyActivity.class)));
 
         setupSearch();
         loadRoutes();

@@ -10,6 +10,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.transportapp.R;
+import com.example.transportapp.model.kmb.StopETAData;
 import com.example.transportapp.model.kmb.StopETAResponse;
 import com.example.transportapp.model.view.BusStopModel;
 import com.example.transportapp.model.view.DetailsItemModel;
@@ -49,7 +50,7 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsI
         filteredItems.clear();
         for (BusStopModel stop : items) {
             boolean hasValidETA = false;
-            for (StopETAResponse.StopETAData etaData : stop.etaData) {
+            for (StopETAData etaData : stop.etaData) {
                 long time = Time.getMinutesDifference(etaData.eta);
                 if (time >= minMinutes && time <= maxMinutes) {
                     hasValidETA = true;
@@ -76,7 +77,7 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsI
     public void onBindViewHolder(@NonNull DetailsItemHolder holder, int position) {
         holder.tvStopName.setText(filteredItems.get(position).stopData.name_en);
         ArrayList<String> etaText = new ArrayList<>();
-        for (StopETAResponse.StopETAData etaData : filteredItems.get(position).etaData) {
+        for (StopETAData etaData : filteredItems.get(position).etaData) {
             long time = Time.getMinutesDifference(etaData.eta);
             if (time == -1) {
                 etaText.add("No Scheduled Bus");

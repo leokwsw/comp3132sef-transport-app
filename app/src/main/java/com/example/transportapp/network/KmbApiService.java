@@ -4,6 +4,7 @@ import com.example.transportapp.model.kmb.RouteListResponse;
 import com.example.transportapp.model.kmb.RouteResponse;
 import com.example.transportapp.model.kmb.RouteStopResponse;
 import com.example.transportapp.model.kmb.StopETAResponse;
+import com.example.transportapp.model.kmb.StopListResponse;
 import com.example.transportapp.model.kmb.StopResponse;
 
 import retrofit2.Call;
@@ -38,5 +39,13 @@ public interface KmbApiService {
             @Path("stopId") String stopId,
             @Path("route") String route,
             @Path("serviceType") String serviceType
+    );
+
+    @GET("stop")
+    Call<StopListResponse> getStopListData();
+
+    @GET("stop-eta/{stop_id}")
+    Call<StopETAResponse> getStopETAFromStopId(
+            @Path("stop_id") String stopId
     );
 }

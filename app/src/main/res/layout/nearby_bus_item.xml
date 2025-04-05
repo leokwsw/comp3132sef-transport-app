@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="4dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="4dp"
+    android:paddingBottom="8dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRouteNum"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:text="273C"
+        android:textSize="22sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvDestPrefix"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="To"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/tvRouteNum"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvDest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="運頭塘邨"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/tvDestPrefix"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="4dp"
+        android:text="運頭塘邨"
+        app:layout_constraintStart_toEndOf="@+id/tvRouteNum"
+        app:layout_constraintTop_toBottomOf="@+id/tvDestPrefix" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:text="10M"
+        app:layout_constraintStart_toEndOf="@+id/tvStop"
+        app:layout_constraintTop_toBottomOf="@+id/tvDest" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvEtaTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12Mins"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

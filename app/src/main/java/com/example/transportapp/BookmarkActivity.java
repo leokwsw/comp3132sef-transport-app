@@ -25,7 +25,7 @@ public class BookmarkActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_bookmark);
 
         bookmarkManager = new BookmarkManager(this);
 

@@ -39,7 +39,10 @@
             android:exported="false" />
         <activity
             android:name=".BookmarkActivity"
-            android:exported="false"/>
+            android:exported="false" />
+        <activity
+            android:name=".NearbyActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
