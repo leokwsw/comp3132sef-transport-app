@@ -1,9 +1,9 @@
 package com.example.transportapp;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageButton;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,7 +15,7 @@ import com.example.transportapp.utils.BookmarkManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity2 extends AppCompatActivity {
+public class BookmarkActivity extends AppCompatActivity {
 
     private RecyclerView bookmarksRecyclerView;
     private BookmarkAdapter bookmarkAdapter;
@@ -23,6 +23,7 @@ public class MainActivity2 extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.example.transportapp.BookmarkActivity;
 import com.example.transportapp.model.BookmarkModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -11,6 +12,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BookmarkManager {
     private static final String PREFS_NAME = "BookmarksPrefs";
@@ -40,7 +42,8 @@ public class BookmarkManager {
         if (bookmarksJson == null) {
             return new ArrayList<>();
         }
-        Type type = new TypeToken<List<BookmarkModel>>() {}.getType();
+        Type type = new TypeToken<List<BookmarkModel>>() {
+        }.getType();
         return gson.fromJson(bookmarksJson, type);
     }
 
