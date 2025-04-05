@@ -47,12 +47,12 @@ public class SearchActivity extends AppCompatActivity implements FilterDialog.Fi
         RecyclerView recyclerView = findViewById(R.id.search_results);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new BusAdapter(new ArrayList<>(), busRoute -> {
-            Intent intent = new Intent(this, DetailsActivity.class);
+            Intent intent = new Intent(SearchActivity.this, DetailsActivity.class);
             intent.putExtra(DetailsActivity.ROUTE_KEY, busRoute.route);
             intent.putExtra(DetailsActivity.SERVICE_TYPE_KEY, busRoute.service_type);
-            intent.putExtra(DetailsActivity.DIRECTION_KEY, busRoute.bound == "O" ? DetailsActivity.DIRECTION_OUTBOUND : DetailsActivity.DIRECTION_INBOUND);
+            intent.putExtra(DetailsActivity.DIRECTION_KEY, busRoute.bound.equals("O") ? DetailsActivity.DIRECTION_OUTBOUND : DetailsActivity.DIRECTION_INBOUND);
             startActivity(intent);
-        });
+        }, this); // Pass context explicitly
         recyclerView.setAdapter(adapter);
 
         // Setup back button
@@ -120,4 +120,4 @@ public class SearchActivity extends AppCompatActivity implements FilterDialog.Fi
         this.airportBusOnly = airportBusOnly;
         performSearch(searchInput.getText().toString());
     }
-} 
+}
