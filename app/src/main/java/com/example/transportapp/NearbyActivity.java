@@ -5,6 +5,10 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -54,6 +58,10 @@ public class NearbyActivity extends AppCompatActivity {
 
     private NearbyAdapter nearbyAdapter = new NearbyAdapter();
 
+    private ProgressBar pd;
+
+    private RadioButton rbRange100, rbRange200, rbRange400;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         EdgeToEdge.enable(this);
@@ -66,7 +74,12 @@ public class NearbyActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(nearbyAdapter);
 
+        pd = findViewById(R.id.progressBar);
+
         requestLocationPermission();
+        findViewById(R.id.back_button).setOnClickListener(v -> onBackPressed());
+
+        setupRadioButtons();
     }
 
     private void requestLocationPermission() {
@@ -133,6 +146,8 @@ public class NearbyActivity extends AppCompatActivity {
 
     private void findMatchNearbyBusStop(boolean skipFilter) {
         nearbyBusStops = new ArrayList<>();
+        nearbyAdapter.setModels(new ArrayList<>());
+
         for (StopData busStop : busStops) {
             if (busStop.lat != null && busStop.lon != null) {
                 try {
@@ -188,5 +203,32 @@ public class NearbyActivity extends AppCompatActivity {
 
     private void setupAdapter() {
         nearbyAdapter.setModels(nearbyItemModels);
+        pd.setVisibility(View.GONE);
+    }
+
+    private void setupRadioButtons() {
+        rbRange100 = findViewById(R.id.rbRange100);
+        rbRange200 = findViewById(R.id.rbRange200);
+        rbRange400 = findViewById(R.id.rbRange400);
+
+
+        rbRange100.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                nearbyRange = NEARBY_RANGE_100;
+                findMatchNearbyBusStop(false);
+            }
+        });
+        rbRange200.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                nearbyRange = NEARBY_RANGE_200;
+                findMatchNearbyBusStop(false);
+            }
+        });
+        rbRange400.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                nearbyRange = NEARBY_RANGE_400;
+                findMatchNearbyBusStop(false);
+            }
+        });
     }
 }
