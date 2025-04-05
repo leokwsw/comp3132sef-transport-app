@@ -42,6 +42,46 @@
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbRange100"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="100M"
+            android:textAlignment="center" />
+
+        <RadioButton
+            android:id="@+id/rbRange200"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="200M"
+            android:textAlignment="center" />
+
+        <RadioButton
+            android:id="@+id/rbRange400"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="400M"
+            android:textAlignment="center" />
+    </RadioGroup>
+
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateTint="#0D47A1" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/nearby_list"
         android:layout_width="match_parent"
@@ -49,5 +89,6 @@
         android:layout_weight="1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/nearby_bus_item" />
+
 
 </androidx.appcompat.widget.LinearLayoutCompat>
