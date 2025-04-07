@@ -20,10 +20,12 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
 
     private List<BookmarkModel> bookmarks;
     private Context context;
+    private BusAdapterCallback callback;
 
-    public BookmarkAdapter(List<BookmarkModel> bookmarks, Context context) {
+    public BookmarkAdapter(List<BookmarkModel> bookmarks, Context context, BusAdapterCallback callback) {
         this.bookmarks = bookmarks;
         this.context = context;
+        this.callback = callback;
     }
 
     @NonNull
@@ -44,6 +46,11 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
         holder.tvNumber.setContentDescription("Bus Number: " + bookmark.getRouteId());
         holder.tvRouteName.setContentDescription("Route Name: " + bookmark.getRouteName());
         holder.tvStops.setContentDescription("Bus Stop: " + bookmark.getStops());
+        holder.view.setOnClickListener(v -> {
+            if(callback != null){
+                callback.onClick(bookmark.getRouteId(), bookmark.getServiceType(), bookmark.getDirection());
+            }
+        });
     }
 
     @Override
@@ -52,10 +59,12 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
     }
 
     public static class BookmarkViewHolder extends RecyclerView.ViewHolder {
+        public View view;
         public TextView tvNumber, tvRouteName, tvStops;
 
         public BookmarkViewHolder(@NonNull View itemView) {
             super(itemView);
+            view = itemView;
             tvNumber = itemView.findViewById(R.id.tvNumber);
             tvRouteName = itemView.findViewById(R.id.tvRouteName);
             tvStops = itemView.findViewById(R.id.tvStops);
