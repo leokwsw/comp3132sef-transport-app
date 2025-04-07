@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:background="#FFFFFF">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
@@ -17,7 +18,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Stop Name"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold"/>
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/stop_bookmark_button"
@@ -40,8 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Next Bus: "
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textSize="14sp" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/eta_time"
@@ -49,7 +50,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:text=""
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textColor="#0D47A1"/>
 
         <ProgressBar
             android:id="@+id/eta_progress"
