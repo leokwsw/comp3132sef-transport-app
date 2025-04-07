@@ -19,21 +19,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Night Bus Only"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:buttonTint="#0D47A1"/>
 
     <CheckBox
         android:id="@+id/express_bus_checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Express Bus Only"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        android:buttonTint="#0D47A1"/>
 
     <CheckBox
         android:id="@+id/airport_bus_checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Airport Bus Only"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        android:buttonTint="#0D47A1"/>
 
     <LinearLayout
         android:layout_width="match_parent"
