@@ -28,6 +28,7 @@ import com.example.transportapp.model.kmb.StopListResponse;
 import com.example.transportapp.model.view.NearbyItemModel;
 import com.example.transportapp.network.KmbApiService;
 import com.example.transportapp.network.RetrofitClient;
+import com.example.transportapp.utils.SystemUtils;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
@@ -42,8 +43,9 @@ public class NearbyActivity extends AppCompatActivity {
 
     private static final int LOCATION_REQUEST_CODE = 100;
 
-    private @FloatRange(from = -90.0, to = 90.0) double mLatitudeDegrees = 0;
-    private @FloatRange(from = -180.0, to = 180.0) double mLongitudeDegrees = 0;
+    // default is HKMU JCC, get from Google Map
+    private @FloatRange(from = -90.0, to = 90.0) double mLatitudeDegrees = 22.3159553;
+    private @FloatRange(from = -180.0, to = 180.0) double mLongitudeDegrees = 114.1785895;
 
     private KmbApiService apiService;
 
@@ -62,6 +64,9 @@ public class NearbyActivity extends AppCompatActivity {
 
     private RadioButton rbRange100, rbRange200, rbRange400;
 
+    private int loadedItemSize = 0;
+    private int loadSize = 20;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         EdgeToEdge.enable(this);
@@ -79,7 +84,12 @@ public class NearbyActivity extends AppCompatActivity {
         requestLocationPermission();
         findViewById(R.id.back_button).setOnClickListener(v -> onBackPressed());
 
-        setupRadioButtons();
+        if (SystemUtils.isEmulator()) {
+            findViewById(R.id.rgRange).setVisibility(View.GONE);
+            getStopList();
+        } else {
+            setupRadioButtons();
+        }
     }
 
     private void requestLocationPermission() {
@@ -119,23 +129,27 @@ public class NearbyActivity extends AppCompatActivity {
                         mLatitudeDegrees = location.getLatitude();
                         mLongitudeDegrees = location.getLongitude();
 
-                        apiService.getStopListData().enqueue(new Callback<StopListResponse>() {
-                            @Override
-                            public void onResponse(@NonNull Call<StopListResponse> call, @NonNull Response<StopListResponse> response) {
-                                if (response.isSuccessful() && response.body() != null) {
-                                    busStops = response.body().data;
-
-                                    findMatchNearbyBusStop(false);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(@NonNull Call<StopListResponse> call, @NonNull Throwable t) {
-                                // TODO : Error Screen
-                            }
-                        });
+                        getStopList();
                     }
                 });
+    }
+
+    private void getStopList() {
+        apiService.getStopListData().enqueue(new Callback<StopListResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<StopListResponse> call, @NonNull Response<StopListResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    busStops = response.body().data;
+
+                    findMatchNearbyBusStop(false);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<StopListResponse> call, @NonNull Throwable t) {
+                // TODO : Error Screen
+            }
+        });
     }
 
     private static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -169,12 +183,6 @@ public class NearbyActivity extends AppCompatActivity {
         }
 
         nearbyBusStops.sort(Comparator.comparingDouble(o -> o.distance));
-        Log.d("Nearby", "nearbyBusStops size : " + nearbyBusStops.size());
-
-        for (StopDataWithDistance stop : nearbyBusStops) {
-            Log.d("Nearby", "ID: " + stop.stop + "，站點: " + stop.name_tc + "，距離: " + stop.distance + " 米");
-        }
-
         getNearbyBusStopRouteWithETA();
     }
 
@@ -202,7 +210,11 @@ public class NearbyActivity extends AppCompatActivity {
     }
 
     private void setupAdapter() {
-        nearbyAdapter.setModels(nearbyItemModels);
+        if (nearbyItemModels.size() > 100) {
+
+        } else {
+            nearbyAdapter.setModels(nearbyItemModels);
+        }
         pd.setVisibility(View.GONE);
     }
 

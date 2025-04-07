@@ -50,6 +50,46 @@
             android:textColorHint="#757575" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbRange100"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="100M"
+            android:textAlignment="center" />
+
+        <RadioButton
+            android:id="@+id/rbRange200"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="200M"
+            android:textAlignment="center" />
+
+        <RadioButton
+            android:id="@+id/rbRange400"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="400M"
+            android:textAlignment="center" />
+    </RadioGroup>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateTint="#0D47A1" />
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/route_list"
         android:layout_width="match_parent"

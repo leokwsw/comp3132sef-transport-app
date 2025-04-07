@@ -25,12 +25,17 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ItemViewHo
         notifyDataSetChanged();
     }
 
+    public void addModels(List<NearbyItemModel> nearbyItemModels){
+        this.nearbyItemModels.addAll(nearbyItemModels);
+        notifyItemInserted(nearbyItemModels.size());
+    }
+
     @NonNull
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ItemViewHolder(
                 LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.nearby_bus_item, parent, false)
+                        .inflate(R.layout.route_item, parent, false)
         );
     }
 
@@ -52,8 +57,8 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ItemViewHo
 
         holder.tvStop.setText(nearbyItemModel.stop.name_tc);
 
-        DecimalFormat dec = new DecimalFormat("#0.00");
-        holder.tvDistance.setText(String.format("%s M", dec.format(nearbyItemModel.stop.distance)));
+//        DecimalFormat dec = new DecimalFormat("#0.00");
+//        holder.tvDistance.setText(String.format("%s M", dec.format(nearbyItemModel.stop.distance)));
     }
 
     @Override
@@ -64,15 +69,14 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ItemViewHo
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
 
-        private AppCompatTextView tvRouteNum, tvDest, tvStop, tvDistance, tvEtaTime;
+        private AppCompatTextView tvRouteNum, tvDest, tvStop, tvEtaTime;
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvRouteNum = itemView.findViewById(R.id.tvRouteNum);
-            tvDest = itemView.findViewById(R.id.tvDest);
-            tvStop = itemView.findViewById(R.id.tvStop);
-            tvDistance = itemView.findViewById(R.id.tvDistance);
-            tvEtaTime = itemView.findViewById(R.id.tvEtaTime);
+            tvRouteNum = itemView.findViewById(R.id.route_name);
+            tvDest = itemView.findViewById(R.id.destination);
+            tvStop = itemView.findViewById(R.id.current_stop);
+            tvEtaTime = itemView.findViewById(R.id.eta_time);
         }
     }
 }
