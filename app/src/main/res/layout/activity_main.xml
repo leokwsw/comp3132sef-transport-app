@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     android:orientation="vertical"
     android:paddingBottom="16dp"
-    tools:context=".MainActivity"
-    android:background="#FFFFFF">
+    tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -49,6 +49,15 @@
             android:textColor="#000000"
             android:textColorHint="#757575" />
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateTint="#0D47A1" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/route_list"

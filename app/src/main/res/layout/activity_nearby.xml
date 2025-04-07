@@ -44,6 +44,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <RadioGroup
+        android:id="@+id/rgRange"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -89,7 +90,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/nearby_bus_item" />
+        tools:listitem="@layout/route_item" />
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

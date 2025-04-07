@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,9 +31,11 @@ import com.example.transportapp.model.kmb.StopData;
 import com.example.transportapp.model.kmb.StopETAData;
 import com.example.transportapp.model.kmb.StopETAResponse;
 import com.example.transportapp.model.kmb.StopResponse;
+import com.example.transportapp.model.view.BookmarkModel;
 import com.example.transportapp.model.view.BusStopModel;
 import com.example.transportapp.network.KmbApiService;
 import com.example.transportapp.network.RetrofitClient;
+import com.example.transportapp.utils.BookmarkManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -94,6 +97,8 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
     private List<BusStopModel> items = new ArrayList<>();
     private DetailsAdapter detailsAdapter = new DetailsAdapter();
 
+    private BookmarkManager bookmarkManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,6 +137,8 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
 
         setTitle();
 
+        bookmarkManager = new BookmarkManager(this);
+
 
 //        findViewById(R.id.back_button).setOnClickListener(v -> onBackPressed());
 
@@ -149,12 +156,41 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(detailsAdapter);
 
+        MenuItem menuItem = findViewById(R.id.menu_bookmark);
+
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.detail_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.menu_bookmark);
+        if (bookmarkManager.isBookmarked(route)) {
+            item.setIcon(R.drawable.ic_bookmark_filled); // Set your new icon here
+        } else {
+            item.setIcon(R.drawable.ic_bookmark_outline); // Set your new icon here
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_bookmark) {
+            BookmarkModel bookmark = new BookmarkModel(
+                    route,
+                    (String) this.getTitle(),
+                    direction,
+                    serviceType,
+                    "" // Assuming stops information is not available in Route, you can adjust this
+            );
+            bookmarkManager.addBookmark(bookmark);
+        }
         return true;
     }
 

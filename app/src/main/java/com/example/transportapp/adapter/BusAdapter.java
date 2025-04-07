@@ -91,7 +91,7 @@ public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 if (callback != null) {
-                    callback.onClick(route);
+                    callback.onClick(route.route, route.service_type, route.bound);
                 }
             }
         });
