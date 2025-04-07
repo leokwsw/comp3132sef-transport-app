@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -41,7 +40,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NearbyDialog.NearbyListener {
 
     private static final int LOCATION_REQUEST_CODE = 100;
 
@@ -51,10 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     private KmbApiService apiService;
 
-    private static final int NEARBY_RANGE_100 = 110;
-    private static final int NEARBY_RANGE_200 = 210;
-    private static final int NEARBY_RANGE_400 = 410;
-    private int nearbyRange = NEARBY_RANGE_100;
+    private int nearbyRange = 110;
 
     private List<StopData> busStops = new ArrayList<>();
     private List<StopDataWithDistance> nearbyBusStops = new ArrayList<>();
@@ -85,7 +81,9 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        findViewById(R.id.nearby_button).setOnClickListener(v -> startActivity(new Intent(MainActivity.this, NearbyActivity.class)));
+        findViewById(R.id.nearby_button).setOnClickListener(v -> {
+            new NearbyDialog(this, nearbyRange).show(getSupportFragmentManager(), "nearby_dialog");
+        });
 
         apiService = RetrofitClient.getService();
 
@@ -107,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
             getStopList();
         } else {
             requestLocationPermission();
-            setupRadioButtons();
         }
     }
 
@@ -236,29 +233,11 @@ public class MainActivity extends AppCompatActivity {
         pd.setVisibility(View.GONE);
     }
 
-    private void setupRadioButtons() {
-        RadioButton rbRange100 = findViewById(R.id.rbRange100);
-        RadioButton rbRange200 = findViewById(R.id.rbRange200);
-        RadioButton rbRange400 = findViewById(R.id.rbRange400);
-
-
-        rbRange100.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                nearbyRange = NEARBY_RANGE_100;
-                findMatchNearbyBusStop(false);
-            }
-        });
-        rbRange200.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                nearbyRange = NEARBY_RANGE_200;
-                findMatchNearbyBusStop(false);
-            }
-        });
-        rbRange400.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                nearbyRange = NEARBY_RANGE_400;
-                findMatchNearbyBusStop(false);
-            }
-        });
+    @Override
+    public void onFilterApplied(int nearbyRange) {
+        Log.d("MainAct", "old : " + this.nearbyRange + " ::: " + nearbyRange);
+        this.nearbyRange = nearbyRange;
+        Log.d("MainAct", "new : " + this.nearbyRange + " ::: " + nearbyRange);
+        findMatchNearbyBusStop(false);
     }
 }

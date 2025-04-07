@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.transportapp.R;
-import com.example.transportapp.model.BookmarkModel;
+import com.example.transportapp.model.view.BookmarkModel;
 import com.example.transportapp.model.kmb.RouteListResponse;
 import com.example.transportapp.utils.BookmarkManager;
 
