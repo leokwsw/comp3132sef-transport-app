@@ -155,10 +155,6 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
         RecyclerView recyclerView = findViewById(R.id.stop_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(detailsAdapter);
-
-        MenuItem menuItem = findViewById(R.id.menu_bookmark);
-
-
     }
 
     @Override
