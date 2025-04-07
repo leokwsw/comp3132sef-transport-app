@@ -6,7 +6,8 @@
     android:paddingStart="4dp"
     android:paddingTop="8dp"
     android:paddingEnd="4dp"
-    android:paddingBottom="8dp">
+    android:paddingBottom="8dp"
+    android:background="#FFFFFF">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvRouteNum"

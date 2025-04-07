@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingBottom="16dp"
-    tools:context=".BookmarkActivity">
+    tools:context=".BookmarkActivity"
+    android:background="#FFFFFF">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
