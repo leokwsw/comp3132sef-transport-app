@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.transportapp.adapter.BookmarkAdapter;
-import com.example.transportapp.model.BookmarkModel;
+import com.example.transportapp.model.view.BookmarkModel;
 import com.example.transportapp.utils.BookmarkManager;
 
 import java.util.ArrayList;
