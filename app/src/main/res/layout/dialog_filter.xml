@@ -1,63 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#FFFFFF"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#FFFFFF">
+    android:padding="16dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:text="Filter Options"
         android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
+        android:textStyle="bold" />
 
     <CheckBox
         android:id="@+id/night_bus_checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Night Bus Only"
         android:layout_marginBottom="8dp"
-        android:buttonTint="#0D47A1"/>
+        android:text="Night Bus Only"
+        app:buttonTint="#0D47A1" />
 
     <CheckBox
         android:id="@+id/express_bus_checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Express Bus Only"
         android:layout_marginBottom="8dp"
-        android:buttonTint="#0D47A1"/>
+        android:text="Express Bus Only"
+        app:buttonTint="#0D47A1" />
 
     <CheckBox
         android:id="@+id/airport_bus_checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Airport Bus Only"
         android:layout_marginBottom="16dp"
-        android:buttonTint="#0D47A1"/>
+        android:text="Airport Bus Only"
+        app:buttonTint="#0D47A1" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end">
+        android:gravity="end"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/cancel_button"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cancel"
             android:layout_marginEnd="8dp"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:textColor="#0D47A1"/>
+            android:text="Cancel"
+            android:textColor="#0D47A1" />
 
         <Button
             android:id="@+id/apply_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Apply"
-            android:backgroundTint="#0D47A1"/>
+            android:backgroundTint="#0D47A1"
+            android:text="Apply" />
     </LinearLayout>
 </LinearLayout> 
