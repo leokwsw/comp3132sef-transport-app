@@ -35,8 +35,8 @@ public class SearchActivity extends AppCompatActivity implements FilterDialog.Fi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
         apiService = RetrofitClient.getService();
