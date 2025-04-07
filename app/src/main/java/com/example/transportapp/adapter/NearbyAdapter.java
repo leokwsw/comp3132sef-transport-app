@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.transportapp.R;
 import com.example.transportapp.model.view.NearbyItemModel;
+import com.example.transportapp.utils.BookmarkManager;
 import com.example.transportapp.utils.Time;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ItemViewHo
 
     private List<NearbyItemModel> nearbyItemModels = new ArrayList<>();
     private BusAdapterCallback callback;
+
 
     public void setModels(@NonNull List<NearbyItemModel> nearbyItemModels) {
         this.nearbyItemModels.clear();

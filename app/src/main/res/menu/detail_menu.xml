@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/new_activity"
+        android:id="@+id/menu_bookmark"
         android:icon="@drawable/ic_bookmark_outline_white"
         android:title="Bookmark"
         app:showAsAction="always" />
