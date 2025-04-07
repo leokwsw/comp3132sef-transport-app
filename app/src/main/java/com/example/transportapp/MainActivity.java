@@ -1,26 +1,39 @@
 package com.example.transportapp;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.FloatRange;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.AppCompatEditText;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.transportapp.adapter.BusAdapter;
-import com.example.transportapp.model.kmb.RouteListResponse;
+import com.example.transportapp.adapter.NearbyAdapter;
+import com.example.transportapp.model.kmb.StopData;
+import com.example.transportapp.model.kmb.StopDataWithDistance;
+import com.example.transportapp.model.kmb.StopETAData;
+import com.example.transportapp.model.kmb.StopETAResponse;
+import com.example.transportapp.model.kmb.StopListResponse;
+import com.example.transportapp.model.view.NearbyItemModel;
 import com.example.transportapp.network.KmbApiService;
 import com.example.transportapp.network.RetrofitClient;
+import com.example.transportapp.utils.SystemUtils;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,9 +43,29 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BusAdapter adapter;
-    private AppCompatEditText searchInput;
+    private static final int LOCATION_REQUEST_CODE = 100;
+
+    // default is HKMU JCC, get from Google Map
+    private @FloatRange(from = -90.0, to = 90.0) double mLatitudeDegrees = 22.3159553;
+    private @FloatRange(from = -180.0, to = 180.0) double mLongitudeDegrees = 114.1785895;
+
     private KmbApiService apiService;
+
+    private static final int NEARBY_RANGE_100 = 110;
+    private static final int NEARBY_RANGE_200 = 210;
+    private static final int NEARBY_RANGE_400 = 410;
+    private int nearbyRange = NEARBY_RANGE_100;
+
+    private List<StopData> busStops = new ArrayList<>();
+    private List<StopDataWithDistance> nearbyBusStops = new ArrayList<>();
+    private final List<NearbyItemModel> nearbyItemModels = new ArrayList<>();
+
+    private final NearbyAdapter nearbyAdapter = new NearbyAdapter();
+
+    private ProgressBar pd;
+
+    private int loadedItemSize = 0;
+    private int loadSize = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,81 +75,189 @@ public class MainActivity extends AppCompatActivity {
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        // Initialize API service
-        apiService = RetrofitClient.getService();
-
-        // Setup RecyclerView
-        RecyclerView recyclerView = findViewById(R.id.route_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new BusAdapter(new ArrayList<>(), busRoute -> {
-            Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-            intent.putExtra(DetailsActivity.ROUTE_KEY, busRoute.route);
-            intent.putExtra(DetailsActivity.SERVICE_TYPE_KEY, busRoute.service_type);
-            intent.putExtra(DetailsActivity.DIRECTION_KEY, Objects.equals(busRoute.bound, "O") ? DetailsActivity.DIRECTION_OUTBOUND : DetailsActivity.DIRECTION_INBOUND);
-            startActivity(intent);
-        }, this);
-        recyclerView.setAdapter(adapter);
-
-        // Setup search input
-        searchInput = findViewById(R.id.search_bar);
-        Button bookmarkButton = findViewById(R.id.bookmark_button);
-
-        searchInput.setOnClickListener(v -> {
+        findViewById(R.id.search_bar).setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, SearchActivity.class);
             startActivity(intent);
         });
 
-        bookmarkButton.setOnClickListener(v -> {
+        findViewById(R.id.bookmark_button).setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, BookmarkActivity.class);
             startActivity(intent);
         });
 
         findViewById(R.id.nearby_button).setOnClickListener(v -> startActivity(new Intent(MainActivity.this, NearbyActivity.class)));
 
-        setupSearch();
-        loadRoutes();
-    }
+        apiService = RetrofitClient.getService();
 
-    private void setupSearch() {
-        searchInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                performSearch(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
+        RecyclerView recyclerView = findViewById(R.id.route_list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(nearbyAdapter);
+        nearbyAdapter.setCallback((String route, String serviceType, String bound) -> {
+            Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+            intent.putExtra(DetailsActivity.ROUTE_KEY, route);
+            intent.putExtra(DetailsActivity.SERVICE_TYPE_KEY, serviceType);
+            intent.putExtra(DetailsActivity.DIRECTION_KEY, Objects.equals(bound, "O") ? DetailsActivity.DIRECTION_OUTBOUND : DetailsActivity.DIRECTION_INBOUND);
+            startActivity(intent);
         });
-    }
 
-    private void performSearch(String query) {
-        List<RouteListResponse.Route> results;
-        if (query.isEmpty()) {
-            results = new ArrayList<>();
+        pd = findViewById(R.id.progressBar);
+
+
+        if (SystemUtils.isEmulator()) {
+            getStopList();
         } else {
-            results = BusRepository.searchRoutes(query);
+            requestLocationPermission();
+            setupRadioButtons();
         }
-        adapter.updateData(results);
     }
 
-    private void loadRoutes() {
-        apiService.getRoutes().enqueue(new Callback<RouteListResponse>() {
+    private void requestLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            enableUserLocation();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+            }, LOCATION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                enableUserLocation();
+            } else {
+                Toast.makeText(this, "Please Allow the Location Permission", Toast.LENGTH_LONG).show();
+                requestLocationPermission();
+            }
+        }
+    }
+
+    private void enableUserLocation() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        LocationServices
+                .getFusedLocationProviderClient(this)
+                .getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        Log.d("NearbyActivity", String.format("%s : %s", location.getLatitude(), location.getLongitude()));
+                        mLatitudeDegrees = location.getLatitude();
+                        mLongitudeDegrees = location.getLongitude();
+
+                        getStopList();
+                    }
+                });
+    }
+
+    private void getStopList() {
+        apiService.getStopListData().enqueue(new Callback<StopListResponse>() {
             @Override
-            public void onResponse(Call<RouteListResponse> call, Response<RouteListResponse> response) {
+            public void onResponse(@NonNull Call<StopListResponse> call, @NonNull Response<StopListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    BusRepository.setRoutes(response.body().data);
-                    adapter.updateData(response.body().data);
+                    busStops = response.body().data;
+
+                    findMatchNearbyBusStop(false);
                 }
             }
 
             @Override
-            public void onFailure(Call<RouteListResponse> call, Throwable t) {
-                Log.e("API_ERROR", "Failed to load routes", t);
+            public void onFailure(@NonNull Call<StopListResponse> call, @NonNull Throwable t) {
+                // TODO : Error Screen
+            }
+        });
+    }
+
+    private static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        float[] result = new float[1];
+        Location.distanceBetween(lat1, lon1, lat2, lon2, result);
+        return result[0];
+    }
+
+    private void findMatchNearbyBusStop(boolean skipFilter) {
+        nearbyBusStops = new ArrayList<>();
+
+        for (StopData busStop : busStops) {
+            if (busStop.lat != null && busStop.lon != null) {
+                try {
+                    double distanceFromMe = calculateDistance(mLatitudeDegrees, mLongitudeDegrees, Double.parseDouble(busStop.lat), Double.parseDouble(busStop.lon));
+
+                    if (skipFilter || distanceFromMe <= nearbyRange) {
+                        StopDataWithDistance stopDataWithDistance = new StopDataWithDistance(busStop, distanceFromMe);
+                        stopDataWithDistance.distance = distanceFromMe;
+                        nearbyBusStops.add(stopDataWithDistance);
+                    }
+                } catch (NumberFormatException numberFormatException) {
+                    // ignore
+                }
+            }
+        }
+
+        while (nearbyBusStops.isEmpty()) {
+            findMatchNearbyBusStop(true);
+        }
+
+        nearbyBusStops.sort(Comparator.comparingDouble(o -> o.distance));
+        getNearbyBusStopRouteWithETA();
+    }
+
+    private void getNearbyBusStopRouteWithETA() {
+        nearbyItemModels.clear();
+        final int[] count = {0};
+//        TODO : need page for handle call
+        for (StopDataWithDistance nearbyBusStop : nearbyBusStops) {
+            apiService.getStopETAFromStopId(nearbyBusStop.stop).enqueue(new Callback<StopETAResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<StopETAResponse> call, @NonNull Response<StopETAResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        count[0] += response.body().data.size();
+                        for (StopETAData etaData : response.body().data) {
+                            NearbyItemModel nearbyItemModel = new NearbyItemModel(nearbyBusStop, etaData);
+                            nearbyItemModels.add(nearbyItemModel);
+                        }
+                        if (nearbyItemModels.size() == count[0]) setupAdapter();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<StopETAResponse> call, @NonNull Throwable t) {
+
+                }
+            });
+        }
+
+    }
+
+    private void setupAdapter() {
+        nearbyAdapter.setModels(nearbyItemModels);
+        pd.setVisibility(View.GONE);
+    }
+
+    private void setupRadioButtons() {
+        RadioButton rbRange100 = findViewById(R.id.rbRange100);
+        RadioButton rbRange200 = findViewById(R.id.rbRange200);
+        RadioButton rbRange400 = findViewById(R.id.rbRange400);
+
+
+        rbRange100.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                nearbyRange = NEARBY_RANGE_100;
+                findMatchNearbyBusStop(false);
+            }
+        });
+        rbRange200.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                nearbyRange = NEARBY_RANGE_200;
+                findMatchNearbyBusStop(false);
+            }
+        });
+        rbRange400.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                nearbyRange = NEARBY_RANGE_400;
+                findMatchNearbyBusStop(false);
             }
         });
     }

@@ -1,5 +1,6 @@
 package com.example.transportapp.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,22 +13,22 @@ import com.example.transportapp.R;
 import com.example.transportapp.model.view.NearbyItemModel;
 import com.example.transportapp.utils.Time;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ItemViewHolder> {
 
     private List<NearbyItemModel> nearbyItemModels = new ArrayList<>();
+    private BusAdapterCallback callback;
 
-    public void setModels(List<NearbyItemModel> nearbyItemModels) {
-        this.nearbyItemModels = nearbyItemModels;
+    public void setModels(@NonNull List<NearbyItemModel> nearbyItemModels) {
+        this.nearbyItemModels.clear();
+        this.nearbyItemModels.addAll(nearbyItemModels);
         notifyDataSetChanged();
     }
 
-    public void addModels(List<NearbyItemModel> nearbyItemModels){
-        this.nearbyItemModels.addAll(nearbyItemModels);
-        notifyItemInserted(nearbyItemModels.size());
+    public void setCallback(BusAdapterCallback callback) {
+        this.callback = callback;
     }
 
     @NonNull
@@ -57,8 +58,13 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ItemViewHo
 
         holder.tvStop.setText(nearbyItemModel.stop.name_tc);
 
-//        DecimalFormat dec = new DecimalFormat("#0.00");
-//        holder.tvDistance.setText(String.format("%s M", dec.format(nearbyItemModel.stop.distance)));
+        holder.itemView.setOnClickListener(v -> {
+            if (callback != null) {
+
+                callback.onClick(nearbyItemModel.stopETAData.route, nearbyItemModel.stopETAData.service_type, nearbyItemModel.stopETAData.dir);
+            }
+        });
+
     }
 
     @Override
@@ -69,10 +75,12 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ItemViewHo
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
 
+        public View itemView;
         private AppCompatTextView tvRouteNum, tvDest, tvStop, tvEtaTime;
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
+            this.itemView = itemView;
             tvRouteNum = itemView.findViewById(R.id.route_name);
             tvDest = itemView.findViewById(R.id.destination);
             tvStop = itemView.findViewById(R.id.current_stop);

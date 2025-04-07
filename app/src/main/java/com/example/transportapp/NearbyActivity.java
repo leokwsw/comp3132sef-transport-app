@@ -160,7 +160,6 @@ public class NearbyActivity extends AppCompatActivity {
 
     private void findMatchNearbyBusStop(boolean skipFilter) {
         nearbyBusStops = new ArrayList<>();
-        nearbyAdapter.setModels(new ArrayList<>());
 
         for (StopData busStop : busStops) {
             if (busStop.lat != null && busStop.lon != null) {
@@ -210,11 +209,7 @@ public class NearbyActivity extends AppCompatActivity {
     }
 
     private void setupAdapter() {
-        if (nearbyItemModels.size() > 100) {
-
-        } else {
-            nearbyAdapter.setModels(nearbyItemModels);
-        }
+        nearbyAdapter.setModels(nearbyItemModels);
         pd.setVisibility(View.GONE);
     }
 

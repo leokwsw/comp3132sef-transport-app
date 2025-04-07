@@ -46,11 +46,11 @@ public class SearchActivity extends AppCompatActivity implements FilterDialog.Fi
         // Setup RecyclerView
         RecyclerView recyclerView = findViewById(R.id.search_results);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new BusAdapter(new ArrayList<>(), busRoute -> {
+        adapter = new BusAdapter(new ArrayList<>(), (String route, String serviceType, String bound) -> {
             Intent intent = new Intent(SearchActivity.this, DetailsActivity.class);
-            intent.putExtra(DetailsActivity.ROUTE_KEY, busRoute.route);
-            intent.putExtra(DetailsActivity.SERVICE_TYPE_KEY, busRoute.service_type);
-            intent.putExtra(DetailsActivity.DIRECTION_KEY, busRoute.bound.equals("O") ? DetailsActivity.DIRECTION_OUTBOUND : DetailsActivity.DIRECTION_INBOUND);
+            intent.putExtra(DetailsActivity.ROUTE_KEY, route);
+            intent.putExtra(DetailsActivity.SERVICE_TYPE_KEY, serviceType);
+            intent.putExtra(DetailsActivity.DIRECTION_KEY, bound.equals("O") ? DetailsActivity.DIRECTION_OUTBOUND : DetailsActivity.DIRECTION_INBOUND);
             startActivity(intent);
         }, this); // Pass context explicitly
         recyclerView.setAdapter(adapter);

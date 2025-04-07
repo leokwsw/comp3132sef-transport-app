@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.transportapp.R;
-import com.example.transportapp.model.view.BookmarkModel;
+import com.example.transportapp.model.BookmarkModel;
 import com.example.transportapp.model.kmb.RouteListResponse;
 import com.example.transportapp.utils.BookmarkManager;
 
@@ -91,7 +91,7 @@ public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 if (callback != null) {
-                    callback.onClick(route);
+                    callback.onClick(route.route, route.service_type, route.bound);
                 }
             }
         });

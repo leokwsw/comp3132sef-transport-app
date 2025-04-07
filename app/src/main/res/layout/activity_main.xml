@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     android:orientation="vertical"
     android:paddingBottom="16dp"
-    tools:context=".MainActivity"
-    android:background="#FFFFFF">
+    tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -51,6 +51,7 @@
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <RadioGroup
+        android:id="@+id/rgRange"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
