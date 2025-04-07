@@ -1,4 +1,4 @@
-package com.example.transportapp.model;
+package com.example.transportapp.model.view;
 
 public class BookmarkModel {
     private String routeId;
