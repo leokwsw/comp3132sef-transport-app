@@ -4,28 +4,28 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.transportapp.adapter.BusAdapterCallback;
 import com.example.transportapp.R;
-import com.example.transportapp.model.BookmarkModel;
+import com.example.transportapp.model.view.BookmarkModel;
 import com.example.transportapp.model.kmb.RouteListResponse;
 import com.example.transportapp.utils.BookmarkManager;
 
 import java.util.List;
 
 public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder> {
+
     private List<RouteListResponse.Route> routes;
-    private final BusAdapterCallback callback;
-    private final BookmarkManager bookmarkManager;
+    private BusAdapterCallback callback;
+    private BookmarkManager bookmarkManager;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView tvNumber, tvRouteName, tvStops;
-        public Button btnBookmark;
+        public ImageButton btnBookmark;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -72,19 +72,19 @@ public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder> {
             public void onClick(View v) {
                 if (bookmarkManager.isBookmarked(route.route)) {
                     bookmarkManager.removeBookmark(route.route);
-                    holder.btnBookmark.setText("Bookmark");
+                    holder.btnBookmark.setImageResource(R.drawable.ic_bookmark_outline);
                 } else {
                     bookmarkManager.addBookmark(bookmark);
-                    holder.btnBookmark.setText("Unbookmark");
+                    holder.btnBookmark.setImageResource(R.drawable.ic_bookmark_filled);
                 }
             }
         });
 
         // Check if the route is already bookmarked
         if (bookmarkManager.isBookmarked(route.route)) {
-            holder.btnBookmark.setText("Unbookmark");
+            holder.btnBookmark.setImageResource(R.drawable.ic_bookmark_filled);
         } else {
-            holder.btnBookmark.setText("Bookmark");
+            holder.btnBookmark.setImageResource(R.drawable.ic_bookmark_outline);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
