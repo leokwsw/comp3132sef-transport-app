@@ -180,14 +180,21 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_bookmark) {
-            BookmarkModel bookmark = new BookmarkModel(
-                    route,
-                    (String) this.getTitle(),
-                    direction,
-                    serviceType,
-                    "" // Assuming stops information is not available in Route, you can adjust this
-            );
-            bookmarkManager.addBookmark(bookmark);
+            if (bookmarkManager.isBookmarked(route)) {
+                bookmarkManager.removeBookmark(route);
+                item.setIcon(R.drawable.ic_bookmark_outline); // Set your new icon here
+            } else {
+                BookmarkModel bookmark = new BookmarkModel(
+                        route,
+                        (String) this.getTitle(),
+                        direction,
+                        serviceType,
+                        "" // Assuming stops information is not available in Route, you can adjust this
+                );
+                item.setIcon(R.drawable.ic_bookmark_filled); // Set your new icon here
+                bookmarkManager.addBookmark(bookmark);
+            }
+
         }
         return true;
     }
