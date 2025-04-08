@@ -27,7 +27,7 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Bookmark stop"
-            android:src="@drawable/ic_bookmark_outline_black" />
+            android:src="@drawable/ic_bookmark_outline" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.appcompat.widget.LinearLayoutCompat
