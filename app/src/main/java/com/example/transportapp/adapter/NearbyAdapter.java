@@ -58,7 +58,7 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ItemViewHo
         }
         holder.tvEtaTime.setText(String.join("\n", etaText));
 
-        holder.tvStop.setText(nearbyItemModel.stop.name_tc);
+        holder.tvStop.setText(nearbyItemModel.stop.name_en);
 
         holder.itemView.setOnClickListener(v -> {
             if (callback != null) {
