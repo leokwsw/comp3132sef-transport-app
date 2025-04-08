@@ -95,7 +95,7 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
     private KmbApiService apiService;
 
     private List<BusStopModel> items = new ArrayList<>();
-    private DetailsAdapter detailsAdapter = new DetailsAdapter();
+    private DetailsAdapter detailsAdapter;
 
     private BookmarkManager bookmarkManager;
 
@@ -138,6 +138,7 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         setTitle();
+        detailsAdapter = new DetailsAdapter(this);
 
         bookmarkManager = new BookmarkManager(this);
 
