@@ -228,7 +228,7 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onResponse(@NonNull Call<RouteResponse> call, @NonNull Response<RouteResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Objects.requireNonNull(getSupportActionBar()).setTitle(String.format("%s : %s -> %s", route, response.body().data.orig_en, response.body().data.dest_en));
+                    Objects.requireNonNull(getSupportActionBar()).setTitle(String.format("%s %s -> %s", route, response.body().data.orig_en, response.body().data.dest_en));
                 }
             }
 
