@@ -102,7 +102,7 @@
             android:backgroundTint="#0D47A1"
             android:text="Bookmarks"
             android:textColor="#FFFFFF"
-            android:drawableStart="@drawable/ic_bookmark_outline"/>
+            android:drawableStart="@drawable/ic_bookmark"/>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.LinearLayoutCompat>
