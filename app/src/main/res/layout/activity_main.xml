@@ -77,6 +77,7 @@
         android:orientation="horizontal"
         android:padding="8dp">
 
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/nearby_button"
             android:layout_width="0dp"
@@ -102,7 +103,7 @@
             android:backgroundTint="#0D47A1"
             android:text="Bookmarks"
             android:textColor="#FFFFFF"
-            android:drawableStart="@drawable/ic_bookmark"/>
+            android:drawableStart="@drawable/ic_bookmark_filled"/>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

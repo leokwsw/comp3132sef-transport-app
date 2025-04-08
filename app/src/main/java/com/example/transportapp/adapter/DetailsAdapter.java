@@ -1,8 +1,12 @@
 package com.example.transportapp.adapter;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageButton;
@@ -11,24 +15,36 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.transportapp.R;
 import com.example.transportapp.model.kmb.StopETAData;
-import com.example.transportapp.model.kmb.StopETAResponse;
+import com.example.transportapp.model.view.BookmarkStopModel;
 import com.example.transportapp.model.view.BusStopModel;
-import com.example.transportapp.model.view.DetailsItemModel;
 import com.example.transportapp.utils.Time;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsItemHolder> {
 
     private List<BusStopModel> items = new ArrayList<>();
-
     private List<BusStopModel> filteredItems = new ArrayList<>();
+    private Set<BookmarkStopModel> bookmarkedStops = new HashSet<>();
+    private SharedPreferences sharedPreferences;
+    private static final String PREFS_NAME = "BookmarksPrefs";
+    private static final String BOOKMARKS_KEY = "bookmarked_stops";
+
+    public DetailsAdapter(Context context) {
+        sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        loadBookmarkedStops();
+    }
 
     public void setItems(List<BusStopModel> items) {
         this.items = items;
         this.filteredItems = new ArrayList<>(items);
-        notifyItemChanged(0, items.size());
+        notifyItemRangeChanged(0, items.size());
     }
 
     public void searchStops(String query) {
@@ -75,16 +91,15 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsI
 
     @Override
     public void onBindViewHolder(@NonNull DetailsItemHolder holder, int position) {
-        holder.tvStopName.setText(filteredItems.get(position).stopData.name_en);
+        BusStopModel busStop = filteredItems.get(position);
+        holder.tvStopName.setText(busStop.stopData.name_en);
         ArrayList<String> etaText = new ArrayList<>();
-        for (StopETAData etaData : filteredItems.get(position).etaData) {
+        for (StopETAData etaData : busStop.etaData) {
             long time = Time.getMinutesDifference(etaData.eta);
             if (time == -1) {
                 etaText.add("No Scheduled Bus");
             } else {
-
                 String format = "%s ";
-
                 if (time > 1) {
                     format += "Minutes";
                 } else {
@@ -97,6 +112,31 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsI
             }
         }
         holder.tvEtaTime.setText(String.join("\n", etaText));
+
+        // Create a new BookmarkStopModel instance for the current bus stop
+        BookmarkStopModel bookmark = new BookmarkStopModel(busStop.stopData.stop, busStop.stopData.name_en);
+
+        // Set bookmark button click listener
+        holder.ivBtnBookmark.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (bookmarkedStops.contains(bookmark)) {
+                    bookmarkedStops.remove(bookmark);
+                    holder.ivBtnBookmark.setImageResource(R.drawable.ic_bookmark_outline);
+                } else {
+                    bookmarkedStops.add(bookmark);
+                    holder.ivBtnBookmark.setImageResource(R.drawable.ic_bookmark_filled);
+                }
+                saveBookmarkedStops();
+            }
+        });
+
+        // Check if the stop is already bookmarked
+        if (bookmarkedStops.contains(bookmark)) {
+            holder.ivBtnBookmark.setImageResource(R.drawable.ic_bookmark_filled);
+        } else {
+            holder.ivBtnBookmark.setImageResource(R.drawable.ic_bookmark_outline);
+        }
     }
 
     @Override
@@ -109,12 +149,29 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsI
         public AppCompatTextView tvEtaTime;
         public AppCompatImageButton ivBtnBookmark;
 
-
         public DetailsItemHolder(@NonNull View itemView) {
             super(itemView);
             tvStopName = itemView.findViewById(R.id.stop_name);
             tvEtaTime = itemView.findViewById(R.id.eta_time);
             ivBtnBookmark = itemView.findViewById(R.id.stop_bookmark_button);
+        }
+    }
+
+    private void saveBookmarkedStops() {
+        Gson gson = new Gson();
+        String json = gson.toJson(bookmarkedStops);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(BOOKMARKS_KEY, json);
+        editor.apply();
+    }
+
+    private void loadBookmarkedStops() {
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString(BOOKMARKS_KEY, null);
+        Type type = new TypeToken<Set<BookmarkStopModel>>() {}.getType();
+        bookmarkedStops = gson.fromJson(json, type);
+        if (bookmarkedStops == null) {
+            bookmarkedStops = new HashSet<>();
         }
     }
 }
