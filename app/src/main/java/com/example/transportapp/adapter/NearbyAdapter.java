@@ -47,7 +47,7 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ItemViewHo
         NearbyItemModel nearbyItemModel = nearbyItemModels.get(position);
 
         holder.tvRouteNum.setText(nearbyItemModel.stopETAData.route);
-        holder.tvDest.setText(nearbyItemModel.stopETAData.dest_en);
+        holder.tvDest.setText(String.format("To : %s", nearbyItemModel.stopETAData.dest_en));
 
         long time = Time.getMinutesDifference(nearbyItemModel.stopETAData.eta);
         ArrayList<String> etaText = new ArrayList<>();
@@ -58,7 +58,7 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ItemViewHo
         }
         holder.tvEtaTime.setText(String.join("\n", etaText));
 
-        holder.tvStop.setText(nearbyItemModel.stop.name_en);
+        holder.tvStop.setText(String.format("Current : %s", nearbyItemModel.stop.name_en));
 
         holder.itemView.setOnClickListener(v -> {
             if (callback != null) {
