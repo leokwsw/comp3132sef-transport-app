@@ -196,8 +196,8 @@ public class MainActivity extends AppCompatActivity implements NearbyDialog.Near
         }
 
         while (
-                mLatitudeDegrees != mDefaultLatitudeDegrees &&
-                        mLongitudeDegrees != mDefaultLongitudeDegrees &&
+//                mLatitudeDegrees != mDefaultLatitudeDegrees &&
+//                        mLongitudeDegrees != mDefaultLongitudeDegrees &&
                         nearbyBusStops.isEmpty()
         ) {
             mLatitudeDegrees = mDefaultLatitudeDegrees;
@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements NearbyDialog.Near
         nearbyItemModels.clear();
         final int[] count = {0};
 //        TODO : need page for handle call
-        for (StopDataWithDistance nearbyBusStop : nearbyBusStops) {
+        for (StopDataWithDistance nearbyBusStop : nearbyBusStops.size() > 50 ? nearbyBusStops.subList(0, 50) : nearbyBusStops) {
             apiService.getStopETAFromStopId(nearbyBusStop.stop).enqueue(new Callback<StopETAResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<StopETAResponse> call, @NonNull Response<StopETAResponse> response) {
