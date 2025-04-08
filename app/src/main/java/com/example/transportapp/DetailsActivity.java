@@ -78,6 +78,7 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
     private String route = "";
     private String direction = "";
     private String serviceType = "";
+    private String title = "";
 
 //    private String route = "17";
 //    private String direction = "outbound";
@@ -185,9 +186,10 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
                 bookmarkManager.removeBookmark(route);
                 item.setIcon(R.drawable.ic_bookmark_outline); // Set your new icon here
             } else {
+                setTitle();
                 BookmarkModel bookmark = new BookmarkModel(
                         route,
-                        (String) this.getTitle(),
+                        title,
                         direction,
                         serviceType,
                         "" // Assuming stops information is not available in Route, you can adjust this
@@ -228,6 +230,7 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onResponse(@NonNull Call<RouteResponse> call, @NonNull Response<RouteResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    title = String.format("%s → %s", response.body().data.orig_en, response.body().data.dest_en);
                     Objects.requireNonNull(getSupportActionBar()).setTitle(String.format("%s : %s -> %s", route, response.body().data.orig_en, response.body().data.dest_en));
                 }
             }
