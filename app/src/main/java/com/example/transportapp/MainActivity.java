@@ -195,7 +195,11 @@ public class MainActivity extends AppCompatActivity implements NearbyDialog.Near
             }
         }
 
-        while (nearbyBusStops.isEmpty()) {
+        while (
+                mLatitudeDegrees != mDefaultLatitudeDegrees &&
+                        mLongitudeDegrees != mDefaultLongitudeDegrees &&
+                        nearbyBusStops.isEmpty()
+        ) {
             mLatitudeDegrees = mDefaultLatitudeDegrees;
             mLongitudeDegrees = mDefaultLongitudeDegrees;
             findMatchNearbyBusStop(true);
