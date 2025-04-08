@@ -84,7 +84,8 @@
             android:layout_weight="1"
             android:backgroundTint="#0D47A1"
             android:text="Nearby"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:drawableStart="@android:drawable/ic_menu_mylocation"/>
 
         <View
             android:layout_width="1dp"
@@ -100,7 +101,8 @@
             android:layout_weight="1"
             android:backgroundTint="#0D47A1"
             android:text="Bookmarks"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:drawableStart="@drawable/ic_bookmark_outline"/>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.LinearLayoutCompat>
