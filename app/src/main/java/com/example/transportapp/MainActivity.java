@@ -45,8 +45,10 @@ public class MainActivity extends AppCompatActivity implements NearbyDialog.Near
     private static final int LOCATION_REQUEST_CODE = 100;
 
     // default is HKMU JCC, get from Google Map
-    private @FloatRange(from = -90.0, to = 90.0) double mLatitudeDegrees = 22.3159553;
-    private @FloatRange(from = -180.0, to = 180.0) double mLongitudeDegrees = 114.1785895;
+    private @FloatRange(from = -90.0, to = 90.0) double mDefaultLatitudeDegrees = 22.3159553;
+    private @FloatRange(from = -180.0, to = 180.0) double mDefaultLongitudeDegrees = 114.1785895;
+    private @FloatRange(from = -90.0, to = 90.0) double mLatitudeDegrees = mDefaultLatitudeDegrees;
+    private @FloatRange(from = -180.0, to = 180.0) double mLongitudeDegrees = mDefaultLongitudeDegrees;
 
     private KmbApiService apiService;
 
@@ -193,7 +195,13 @@ public class MainActivity extends AppCompatActivity implements NearbyDialog.Near
             }
         }
 
-        while (nearbyBusStops.isEmpty()) {
+        while (
+                mLatitudeDegrees != mDefaultLatitudeDegrees &&
+                        mLongitudeDegrees != mDefaultLongitudeDegrees &&
+                        nearbyBusStops.isEmpty()
+        ) {
+            mLatitudeDegrees = mDefaultLatitudeDegrees;
+            mLongitudeDegrees = mDefaultLongitudeDegrees;
             findMatchNearbyBusStop(true);
         }
 

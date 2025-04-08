@@ -41,7 +41,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text=""
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:textColor="#0D47A1"/>
 
             <ProgressBar
                 android:id="@+id/eta_progress"
